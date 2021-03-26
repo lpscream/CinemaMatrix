@@ -14,3 +14,5 @@
 .cxx
 /app/src/main/java/net/matrixhome/kino/data/Constants.java
 /app/src/main/java/net/matrixhome/kino/data/CheckService.java
+/app/src/androidTest/java/net/matrixhome/kino/
+/app/src/test/java/net/matrixhome/kino/
