@@ -1,2 +1,4 @@
 /build
 /src/main/java/net/matrixhome/kino/data/CheckService.java
+/src/androidTest/java/net/matrixhome/kino/
+/src/test/java/net/matrixhome/kino/
