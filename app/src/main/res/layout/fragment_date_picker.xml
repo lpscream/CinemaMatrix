@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@android:style/Widget.FragmentBreadCrumbs"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:background="@color/exo_gray"
+    tools:context=".gui.DatePickerFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/fromyear" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/btnUpYearFrom"
+                    android:layout_width="50dip"
+                    android:layout_height="50dip"
+                    android:background="@drawable/serial_btn_selector"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/btn_up_arrow" />
+
+                <TextView
+                    android:id="@+id/currentYearFrom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="1922" />
+
+                <ImageButton
+                    android:id="@+id/btnDownYearFrom"
+                    android:layout_width="50dip"
+                    android:layout_height="50dip"
+                    android:background="@drawable/serial_btn_selector"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/btn_down_arrow" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView18"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/toyear" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/btnUpYearTo"
+                    android:layout_width="50dip"
+                    android:layout_height="50dip"
+                    android:background="@drawable/serial_btn_selector"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/btn_up_arrow" />
+
+                <TextView
+                    android:id="@+id/currentYearTo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="2021" />
+
+                <ImageButton
+                    android:id="@+id/btnDownYearTo"
+                    android:layout_width="50dip"
+                    android:layout_height="50dip"
+                    android:background="@drawable/serial_btn_selector"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/btn_down_arrow" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnOk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@android:string/ok" />
+    </LinearLayout>
+
+</FrameLayout>

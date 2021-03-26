@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Кинозал</string>
+    <string name="allFilms">Все</string>
+    <string name="world_film">Мировое кино</string>
+    <string name="our_film">Наше кино</string>
+    <string name="animation">Мультфильмы</string>
+    <string name="animation_serial">Мультсериалы</string>
+    <string name="world_serial">Зарубежный Сериал</string>
+    <string name="owr_serial">Наш Сериал</string>
+    <string name="year">"Год: "</string>
+    <string name="country">Страна:</string>
+    <string name="genre">"Жанр: "</string>
+    <string name="director">"Режиссер: "</string>
+    <string name="actors">Актеры:</string>
+    <string name="fullscreen">На весь экран</string>
+    <string name="youtube_trailer_button">Смотреть трейлер</string>
+    <string name="letsplay">Смотреть</string>
+    <string name="tv_shows">Телепередачи</string>
+    <string name="search">Поиск</string>
+    <string name="alertForUpdate">Доступно обновление приложения \"Кинозал\" - желаете обновиться? Если вы согласны - вы будете перенаправлены к скачиванию APK файла, который затем нужно будет открыть.</string>
+    <string name="hasNoConnection">Нет подключения к интернету!!!</string>
+    <string name="tryAgain">Попробовать еще раз.</string>
+    <string name="exitAPP">Выход</string>
+    <string name="noresult">Нет результатов</string>
+    <string name="ganressign">Жанры</string>
+    <string name="fromyear">От: </string>
+    <string name="toyear">До: </string>
+    <string name="download">Скачать</string>
+    <string name="translate">Перевод:</string>
+    <string name="ishd">Качество:</string>
+    <string name="byDateAdded">По дате добавления</string>
+    <string name="byPopularity">По популярности</string>
+    <string name="byViews">По просмотрам</string>
+    <string name="byRating">По рейтингу</string>
+    <string name="byName">По названию</string>
+    <string name="byDatePremiere">По дате премьеры</string>
+    <string name="estimated">По оценкам</string>
+    <string name="films">Фильмы</string>
+    <string name="serials">Сериалы</string>
+    <string name="season">Сезон:</string>
+    <string name="episode">Серия:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

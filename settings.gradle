@@ -1,0 +1,6 @@
+include ':app'
+rootProject.name = "Кинозал"
+
+gradle.ext.exoplayerRoot = 'ExoPlayer'
+gradle.ext.exoplayerModulePrefix = 'exoplayer-2.11.5'
+apply from: new File(gradle.ext.exoplayerRoot, 'core_settings.gradle')

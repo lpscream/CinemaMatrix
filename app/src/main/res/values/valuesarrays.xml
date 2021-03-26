@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="genres">
+        <item>Все жанры</item>
+        <item>биография</item>
+        <item>боевик</item>
+        <item>вестерн</item>
+        <item>военный</item>
+        <item>детектив</item>
+        <item>документальное</item>
+        <item>драма</item>
+        <item>исторический</item>
+        <item>катастрофы</item>
+        <item>комедия</item>
+        <item>криминал</item>
+        <item>мелодрама</item>
+        <item>музыкальный</item>
+        <item>приключение</item>
+        <item>семейный</item>
+        <item>спорт</item>
+        <item>триллер</item>
+        <item>ужасы</item>
+        <item>фантастика</item>
+        <item>фэнтези</item>
+    </string-array>
+
+    <string-array name="filmsserials">
+        <item>Фильмы</item>
+        <item>Мультфильмы</item>
+        <item>Сериалы</item>
+        <item>Мультсериалы</item>
+        <item>Телепередачи</item>
+    </string-array>
+
+
+    <string-array name="countries">
+        <item>Все страны</item>
+        <item>Наше</item>
+        <item>Зарубежное</item>
+    </string-array>
+
+    <string-array name="countriesid">
+        <item>&amp;made=our</item>
+        <item>&amp;made=foreign</item>
+    </string-array>
+</resources>

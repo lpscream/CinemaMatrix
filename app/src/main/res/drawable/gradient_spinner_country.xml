@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item android:state_focused="true">
+        <layer-list>
+            <item>
+                <shape>
+                    <solid android:color="@color/colorGrey" />
+
+                    <stroke android:width="1dp" android:color="#000000" />
+
+                    <corners android:radius="8dp" />
+
+                    <padding android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp" />
+                </shape>
+            </item>
+
+            <item android:width="40dp" android:height="40dp" android:gravity="center">
+
+                <bitmap android:gravity="fill_horizontal|fill_vertical|center" android:src="@drawable/wondicon512512" />
+            </item>
+        </layer-list>
+    </item>
+
+
+    <item>
+        <layer-list>
+            <item>
+                <shape>
+
+
+                    <solid android:color="#4AC1C1C1" />
+
+                    <stroke android:width="1dp" android:color="#000000" />
+
+                    <corners android:radius="8dp" />
+
+                    <padding android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp" />
+                </shape>
+            </item>
+
+            <item android:width="40dp" android:height="40dp" android:gravity="center">
+
+                <bitmap android:gravity="fill_horizontal|fill_vertical|center" android:src="@drawable/wondicon512512" />
+            </item>
+        </layer-list>
+    </item>
+
+
+</selector>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "445968808258",
+    "project_id": "net-matrixhome-kino",
+    "storage_bucket": "net-matrixhome-kino.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445968808258:android:1c8345761ea5557664b0db",
+        "android_client_info": {
+          "package_name": "net.matrixhome.kino"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445968808258-bo7tte08o7cek0tno9ioaqtstndk722e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHJaddZgnD-8237vkLuTmt8a8cQyagXF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445968808258-bo7tte08o7cek0tno9ioaqtstndk722e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,123 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 29
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+
+    defaultConfig {
+        applicationId "net.matrixhome.kino"
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode 40
+        versionName "1.1"
+
+        //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        def API_KEY = 'API_KEY'
+        release {
+            //buildConfigField String API_KEY '&api_key=t9zNvvnwjXvwTeSbcdVEU2DhkTJ4q39s'
+            minifyEnabled true
+            //resValue "string", "api_key", "&api_key=t9zNvvnwjXvwTeSbcdVEU2DhkTJ4q39s"
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            //buildConfigField String API_KEY "&api_key=t9zNvvnwjXvwTeSbcdVEU2DhkTJ4q39s"
+        }
+        debug{
+            //buildConfigField String API_KEY ''
+            minifyEnabled false
+            //resValue "string", "api_key", ""
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            //buildConfigField String API_KEY ""
+        }
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            //include 'x86', 'armeabi-v7a'
+            include 'x86'
+            include 'armeabi-v7a'
+            //include 'armeabi-v8a'
+            universalApk false
+        }
+    }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.gridlayout:gridlayout:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    //exoplayer implementation
+    def exoVersion = '2.11.5'
+    /*implementation project(':exoplayer-' + exoVersion +'library-core')
+    implementation project(':exoplayer-' + exoVersion +'library-core')
+    implementation project(':exoplayer-' + exoVersion +'library-dash')//
+    implementation project(':exoplayer-' + exoVersion + 'library-ui')
+    implementation project(':exoplayer-' + exoVersion + 'extension-okhttp')
+    implementation project(':exoplayer-' + exoVersion + 'extension-ffmpeg')
+    implementation project(path: ':exoplayer-' + exoVersion + 'library-smoothstreaming')
+    implementation project(path: ':exoplayer-' + exoVersion + 'library-hls')
+    implementation project(':exoplayer-' + exoVersion + 'library')
+    implementation project(':exoplayer-' + exoVersion + 'extension-mediasession')//
+*/
+    // Base implementation with a standard SeekBar
+    implementation 'com.github.rubensousa:previewseekbar:3.0.0'
+
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.12.0'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.0'
+
+
+    //picture downloader
+    implementation 'com.squareup.picasso:picasso:2.8'
+
+    //firebase console
+    implementation platform('com.google.firebase:firebase-bom:26.2.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:26.4.0')
+
+    // Declare the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+
+    //okhttp downloader
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+
+    //implementation 'com.google.code.gson:gson:2.8.6'
+
+    //number picker
+    implementation('com.michaelmuenzer.android:ScrollableNumberPicker:0.2.2')
+
+
+    //implementation 'com.simmorsal.library:concealer_nested_scroll_view:2.0.0'
+
+
+}
