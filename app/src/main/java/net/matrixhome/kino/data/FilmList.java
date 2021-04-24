@@ -31,7 +31,6 @@ public class FilmList implements Serializable {
     public String count_torrents = "";
     public String translate = "";
     public String genres = "";
-    //public List<Integer> genres_ids;
     public String cover = "";
     public String category = "";
     public String original_name = "";
@@ -41,8 +40,7 @@ public class FilmList implements Serializable {
     public String mpaa = "";
     public String serial_views = "";
     public String video_views = "";
-    public Collection<String> trailer_urls;
-    //public List<Integer> series;
+    public ArrayList<String> trailer_urls = new ArrayList<>();
     public String url = "";
     public String cover_200 = "";
     public ArrayList<String> series = new ArrayList<>();

@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <AutoCompleteTextView
+        <EditText
             android:id="@+id/searchTV"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -29,7 +29,7 @@
             android:maxLines="1"
             android:minLines="1"
             android:singleLine="true"
-            android:text="@string/search"
+            android:hint="@string/search"
             android:textSize="12sp" />
 
         <Spinner
@@ -154,6 +154,7 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/linearLayoutLastAdded"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -176,13 +177,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linearLayoutByPopularity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/worldfilmTV"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
@@ -191,7 +193,7 @@
                     android:textSize="18sp" />
 
                 <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/worldfilmRecView"
+                    android:id="@+id/byPopularityFilmRecView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal" />
@@ -199,13 +201,14 @@
 
 
             <LinearLayout
+                android:id="@+id/linearLayoutByViews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/ourfilmTV"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
@@ -214,20 +217,21 @@
                     android:textSize="18sp" />
 
                 <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/ourfilmRecView"
+                    android:id="@+id/byViewsFilmRecView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linearLayoutByRating"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/animationTV"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
@@ -236,13 +240,14 @@
                     android:textSize="18sp" />
 
                 <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/animationRecView"
+                    android:id="@+id/byRatingRecView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linearLayoutByName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -258,19 +263,20 @@
                     android:textSize="18sp" />
 
                 <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/animationSerialRecView"
+                    android:id="@+id/byNameRecView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linearLayoutByDatePremiere"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/worldSerialTV"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
@@ -279,19 +285,20 @@
                     android:textSize="18sp" />
 
                 <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/worldSerialRecView"
+                    android:id="@+id/byDatePremiereRecView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linearLayoutEstimated"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/owrSerialTV"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
@@ -300,7 +307,7 @@
                     android:textSize="18sp" />
 
                 <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/owrSerialRecView"
+                    android:id="@+id/estimatedRecView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>

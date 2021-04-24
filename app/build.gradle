@@ -14,13 +14,13 @@ android {
 
     defaultConfig {
         applicationId "net.matrixhome.kino"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 29
-        versionCode 40
+        versionCode 41
         versionName "1.1"
-
+        //project.ext.set()
         //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
+        //project.ext.set("archivesBaseName", defaultConfig.applicationId);
         multiDexEnabled true
     }
 
@@ -116,8 +116,48 @@ dependencies {
     //number picker
     implementation('com.michaelmuenzer.android:ScrollableNumberPicker:0.2.2')
 
-
     //implementation 'com.simmorsal.library:concealer_nested_scroll_view:2.0.0'
+
+    def lifecycle_version = "2.3.1"
+    def arch_version = "2.1.0"
+
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    // Lifecycles only (without ViewModel or LiveData)
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+
+    // Saved state module for ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+
+    // Jetpack Compose Integration for ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha03"
+
+    // Annotation processor
+    //kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    // alternately - if using Java8, use the following instead of lifecycle-compiler
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+
+    // optional - helpers for implementing LifecycleOwner in a Service
+    implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
+
+    // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
+
+    // optional - ReactiveStreams support for LiveData
+    implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version"
+
+    // optional - Test helpers for LiveData
+    testImplementation "androidx.arch.core:core-testing:$arch_version"
+
+    implementation "androidx.lifecycle:lifecycle-livedata-core:2.3.1"
+
+    implementation "android.arch.lifecycle:extensions:1.0.0"
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
+
+    //Blur Shadow Image View
+    //implementation 'com.github.virtualvivek:BlurShadowImageView:2.1'
 
 
 }

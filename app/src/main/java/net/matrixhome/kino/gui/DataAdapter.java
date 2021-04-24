@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import net.matrixhome.kino.R;
 import net.matrixhome.kino.data.FilmList;
@@ -47,7 +48,6 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         if (filmLists.get(position).serial_name != "null") {
             holder.filmName.setText(filmLists.get(position).serial_name);
         } else {
@@ -98,6 +98,7 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         for (int i = num; i < getItemCount(); i++) {
             Log.d(TAG, "setItems: " + i);
             notifyItemInserted(i);
+            //notifyItemRangeInserted();
         }
 
         //notifyDataSetChanged();
@@ -112,7 +113,9 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
+        if (filmLists != null)
         return filmLists.size();
+            else return 0;
     }
 
 

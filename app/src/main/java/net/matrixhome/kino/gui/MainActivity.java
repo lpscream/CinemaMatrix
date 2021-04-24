@@ -1,6 +1,5 @@
 package net.matrixhome.kino.gui;
 
-import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,18 +19,21 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import net.matrixhome.kino.BuildConfig;
 import net.matrixhome.kino.R;
 import net.matrixhome.kino.data.CheckService;
+import net.matrixhome.kino.data.Connection;
 import net.matrixhome.kino.data.Constants;
 import net.matrixhome.kino.data.DataLoaderXML;
 import net.matrixhome.kino.data.FilmList;
 import net.matrixhome.kino.data.Genre;
 import net.matrixhome.kino.data.SettingsManager;
-import net.matrixhome.kino.data.Updater;
 import net.matrixhome.kino.data.Years;
+import net.matrixhome.kino.viewmodel.FilmViewModel;
+import net.matrixhome.kino.viewmodel.MainViewModelFactory;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,6 +45,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
     private ArrayList<Genre> genreArrayList;
     private Years years;
     private Spinner genreSpinner;
-    private Spinner counrtySpinner;
+    private Spinner countrySpinner;
     private Spinner yearFromSpinner;
     private Spinner yearToSpinner;
     private ImageButton yearDurationBtn;
@@ -75,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
     private String yearFrom;
     private String yearTo;
     private String yearFromTo;
-    private int position;
     private Button filmsBtn;
     private Button animBtn;
     private Button serialBtn;
@@ -91,21 +92,13 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
     private ArrayList<FilmList> byDatePremiereFilmLists;
     private ArrayList<FilmList> estimatedFilmLists;
 
-    private ArrayList<FilmList> bundleLastAddedFilmList;
-    private ArrayList<FilmList> bundleByPopularityFilmFilmLists;
-    private ArrayList<FilmList> bundleByViewsFilmLists;
-    private ArrayList<FilmList> bundleByRatingFilmLists;
-    private ArrayList<FilmList> bundleByNameFilmLists;
-    private ArrayList<FilmList> bundleByDatePremiereFilmLists;
-    private ArrayList<FilmList> bundleEstimatedFilmLists;
-
-    private ArrayList<FilmList> updateLastAddedFilmList;
-    private ArrayList<FilmList> updateByPopularityFilmFilmLists;
-    private ArrayList<FilmList> updateByViewsFilmFilmLists;
-    private ArrayList<FilmList> updateByRatingFilmLists;
-    private ArrayList<FilmList> updateByNameFilmLists;
-    private ArrayList<FilmList> updateByDatePremiereFilmLists;
-    private ArrayList<FilmList> updateEstimatedFilmLists;
+    private LinearLayout linearLayoutLastAdded;
+    private LinearLayout linearLayoutByPopularity;
+    private LinearLayout linearLayoutByViews;
+    private LinearLayout linearLayoutByRating;
+    private LinearLayout linearLayoutByName;
+    private LinearLayout linearLayoutByDatePremiere;
+    private LinearLayout linearLayoutEstimated;
 
     private RecyclerView lastAddedRecView;
     private RecyclerView byPopularityFilmRecView;
@@ -115,13 +108,7 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
     private RecyclerView byDatePremiereRecView;
     private RecyclerView estimatedRecView;
 
-    private LinearLayoutManager lastAddedRecLayManager;
-    private LinearLayoutManager byPopularityFilmRecLayManager;
-    private LinearLayoutManager byViewsFilmRecLayManager;
-    private LinearLayoutManager byRatingRecLayManager;
-    private LinearLayoutManager byNameRecLayManager;
-    private LinearLayoutManager byDatePremiereRecLayManager;
-    private LinearLayoutManager estimatedRecLayManager;
+
 
     private DataAdapter lastAddedFilmsDataAdapter;
     private DataAdapter byPopularityFilmDataAdapter;
@@ -134,21 +121,8 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
     private ConstraintLayout superLayout;
     private EditText searchTV;
     private DataDurrationFragmnet datePickerFragment;
-    private boolean restoreState = false;
+    private FilmViewModel filmViewModel;
 
-    public static boolean hasConnection(final Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (wifiInfo != null && wifiInfo.isConnected()) {
-            return true;
-        }
-        wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-        if (wifiInfo != null && wifiInfo.isConnected()) {
-            return true;
-        }
-        wifiInfo = cm.getActiveNetworkInfo();
-        return wifiInfo != null && wifiInfo.isConnected();
-    }
 
     @Override
     protected void onStart() {
@@ -166,21 +140,6 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: ");
-        if (!restoreState) {
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("bundleLastAddedFilmList", bundleLastAddedFilmList);
-        outState.putSerializable("bundleByDatePremiereFilmLists", bundleByDatePremiereFilmLists);
-        outState.putSerializable("bundleByNameFilmLists", bundleByNameFilmLists);
-        outState.putSerializable("bundleByPopularityFilmFilmLists", bundleByPopularityFilmFilmLists);
-        outState.putSerializable("bundleByRatingFilmLists", bundleByRatingFilmLists);
-        outState.putSerializable("bundleByViewsFilmLists", bundleByViewsFilmLists);
-        outState.putSerializable("bundleEstimatedFilmLists", bundleEstimatedFilmLists);
-        outState.putSerializable("genreArrayList", genreArrayList);
     }
 
     @Override
@@ -194,15 +153,13 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: started activity ");
-        restoreState = savedInstanceState != null;
-        Log.d(TAG, "onCreate: savedInstanceState is " + restoreState);
         //проверка соединения с интернет
-        if (!hasConnection(this)) {
+        if (!Connection.hasConnection(this)) {
             Intent intent = new Intent(this, ConnectionActivity.class);
             startActivity(intent);
         }
         //вкл./выкл обнровления
-        new Updater().execute(this);
+        //new Updater().execute(this);
         checkService = new CheckService();
         if (!checkService.check()) {
             finish();
@@ -210,270 +167,119 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
 
         initVariables();
 
-
-        /*if (restoreState) {
-            Log.d(TAG, "onCreate: restore data");
-            genreArrayList = new ArrayList<Genre>();
-            genreArrayList.addAll((ArrayList<Genre>) savedInstanceState.getSerializable("genreArrayList"));
-
-            bundleLastAddedFilmList = (ArrayList<FilmList>) savedInstanceState
-                    .getSerializable("bundleLastAddedFilmList");
-            Log.d(TAG, "onCreate: backup size is " + bundleLastAddedFilmList.size());
-            restoreView(bundleLastAddedFilmList,
-                    lastAddedFilmList, lastAddedRecView, lastAddedRecLayManager, lastAddedFilmsDataAdapter);
-
-
-            bundleByPopularityFilmFilmLists.addAll((ArrayList<FilmList>) savedInstanceState
-                    .getSerializable("bundleByPopularityFilmFilmLists"));
-            Log.d(TAG, "onCreate: backup size is " + bundleByPopularityFilmFilmLists.size());
-            restoreView(bundleByPopularityFilmFilmLists
-                    , byPopularityFilmFilmLists, byPopularityFilmRecView, byPopularityFilmRecLayManager
-                    , byPopularityFilmDataAdapter);
-
-
-            bundleByViewsFilmLists.addAll((ArrayList<FilmList>) savedInstanceState
-                    .getSerializable("bundleByViewsFilmLists"));
-            Log.d(TAG, "onCreate: backup size is " + bundleByViewsFilmLists.size());
-            restoreView(bundleByViewsFilmLists,
-                    byViewsFilmLists, byViewsFilmRecView, byViewsFilmRecLayManager, byViewsFilmDataAdapter);
-
-
-            bundleByRatingFilmLists.addAll((ArrayList<FilmList>) savedInstanceState
-                    .getSerializable("bundleByRatingFilmLists"));
-            Log.d(TAG, "onCreate: backup size is " + backup.size());
-            restoreView(bundleByRatingFilmLists,
-                    byRatingFilmLists, byRatingRecView, byRatingRecLayManager, byRatingDataAdapter);
-
-
-            bundleByNameFilmLists.addAll((ArrayList<FilmList>) savedInstanceState
-                    .getSerializable("bundleByNameFilmLists"));
-            Log.d(TAG, "onCreate: backup size is " + backup.size());
-            restoreView(bundleByNameFilmLists
-                    , byNameFilmLists, byNameRecView, byNameRecLayManager, byNameDataAdapter);
-
-
-            bundleByDatePremiereFilmLists.addAll((ArrayList<FilmList>) savedInstanceState
-                    .getSerializable("bundleByDatePremiereFilmLists"));
-            Log.d(TAG, "onCreate: backup size is " + backup.size());
-            restoreView(bundleByDatePremiereFilmLists
-                    , byDatePremiereFilmLists, byDatePremiereRecView, byDatePremiereRecLayManager, byDatePremiereDataAdapter);
-
-
-            bundleEstimatedFilmLists.addAll((ArrayList<FilmList>) savedInstanceState
-                    .getSerializable("bundleEstimatedFilmLists"));
-            Log.d(TAG, "onCreate: backup size is " + backup.size());
-            restoreView(bundleEstimatedFilmLists
-                    , estimatedFilmLists, estimatedRecView, estimatedRecLayManager, estimatedDataAdapter);
-        } else {*/
-
-        //initMultiThread();
-
         initWithoutMultuThread();
 
 
-
-
-
-
-        //getGenres("?action=genre");
-        //}
-
-        getGenres("?action=genre");
-        initGenreSpinner();
         initCountrySpinner();
         //initSpinnerYears();
+        setObservers();
     }
 
     private void initWithoutMultuThread() {
         //lastAddedFilmList
         getWorldFilms("?action=video&sort_desc=added" + "&limit=" + Constants.COUNT, getAllDataList
                 , lastAddedFilmList
-                , lastAddedRecView, lastAddedRecLayManager
-                , lastAddedFilmsDataAdapter, bundleLastAddedFilmList);
-        lastAddedFilmsDataAdapter.notifyDataSetChanged();
+                , lastAddedRecView
+                , lastAddedFilmsDataAdapter);
+        //lastAddedFilmsDataAdapter.notifyDataSetChanged();
+        //filmViewModel.add(lastAddedFilmList);
         Log.d(TAG, "onCreate: ///////////////////lastAddedFilmList");
         //byPopularityFilmFilmLists
         getWorldFilms("?action=video&sort_desc=views_month" + "&limit=" + Constants.COUNT
                 , getAllDataList
-                , byPopularityFilmFilmLists, byPopularityFilmRecView, byPopularityFilmRecLayManager,
-                byPopularityFilmDataAdapter, bundleByPopularityFilmFilmLists);
-        byPopularityFilmDataAdapter.notifyDataSetChanged();
+                , byPopularityFilmFilmLists, byPopularityFilmRecView,
+                byPopularityFilmDataAdapter);
+        //byPopularityFilmDataAdapter.notifyDataSetChanged();
         Log.d(TAG, "onCreate: ///////////////////byPopularityFilmFilmLists");
         //byViewsFilmLists
         getWorldFilms("?action=video&sort_desc=views" + "&limit=" + Constants.COUNT
                 , getAllDataList
-                , byViewsFilmLists, byViewsFilmRecView, byViewsFilmRecLayManager
-                , byViewsFilmDataAdapter, bundleByViewsFilmLists);
-        byViewsFilmDataAdapter.notifyDataSetChanged();
+                , byViewsFilmLists, byViewsFilmRecView
+                , byViewsFilmDataAdapter);
+        //byViewsFilmDataAdapter.notifyDataSetChanged();
         Log.d(TAG, "onCreate: ///////////////////byViewsFilmLists");
         //byRatingFilmLists
         getWorldFilms("?action=video&sort_desc=rating" + "&limit=" + Constants.COUNT
                 , getAllDataList
-                , byRatingFilmLists, byRatingRecView, byRatingRecLayManager
-                , byRatingDataAdapter, bundleByRatingFilmLists);
-        byRatingDataAdapter.notifyDataSetChanged();
+                , byRatingFilmLists, byRatingRecView
+                , byRatingDataAdapter);
+        //byRatingDataAdapter.notifyDataSetChanged();
         Log.d(TAG, "onCreate: ///////////////////byRatingFilmLists");
         //byNameFilmLists
         getWorldFilms("?action=video&sort_desc=name" + "&limit=" + Constants.COUNT
                 , getAllDataList
-                , byNameFilmLists, byNameRecView, byNameRecLayManager
-                , byNameDataAdapter, bundleByNameFilmLists);
-        byNameDataAdapter.notifyDataSetChanged();
+                , byNameFilmLists, byNameRecView
+                , byNameDataAdapter);
+        //byNameDataAdapter.notifyDataSetChanged();
         Log.d(TAG, "onCreate: ///////////////////byNameFilmLists");
         //byDatePremiereFilmLists
         getWorldFilms("?action=video&sort_desc=date_premiere" + "&limit=" + Constants.COUNT
                 , getAllDataList
-                , byDatePremiereFilmLists, byDatePremiereRecView, byDatePremiereRecLayManager
-                , byDatePremiereDataAdapter, bundleByDatePremiereFilmLists);
-        byDatePremiereDataAdapter.notifyDataSetChanged();
+                , byDatePremiereFilmLists, byDatePremiereRecView
+                , byDatePremiereDataAdapter);
+        //byDatePremiereDataAdapter.notifyDataSetChanged();
         Log.d(TAG, "onCreate: ///////////////////byDatePremiereFilmLists");
 
         getWorldFilms("?action=video&sort_desc=rating_vote" + "&limit=" + Constants.COUNT
                 , getAllDataList
-                , estimatedFilmLists, estimatedRecView, estimatedRecLayManager
-                , estimatedDataAdapter, bundleEstimatedFilmLists);
-        estimatedDataAdapter.notifyDataSetChanged();
+                , estimatedFilmLists, estimatedRecView
+                , estimatedDataAdapter);
+        //estimatedDataAdapter.notifyDataSetChanged();
         Log.d(TAG, "onCreate: ///////////////////estimatedFilmLists");
     }
 
-    private void initMultiThread() {
-        ArrayList<ArrayList<FilmList>> collection = new ArrayList<>();
-        ArrayList<ArrayList<FilmList>> collection2 = new ArrayList<>();
-        ArrayList<String> urlList = new ArrayList<>();
-
-        collection2.add(lastAddedFilmList);
-        collection2.add(byPopularityFilmFilmLists);
-        collection2.add(byViewsFilmLists);
-        collection2.add(byRatingFilmLists);
-        collection2.add(byNameFilmLists);
-        collection2.add(byDatePremiereFilmLists);
-        collection2.add(estimatedFilmLists);
-
-        urlList.add("?action=video&sort_desc=added" + "&limit=" + Constants.COUNT);
-        urlList.add("?action=video&sort_desc=views_month" + "&limit=" + Constants.COUNT);
-        urlList.add("?action=video&sort_desc=views" + "&limit=" + Constants.COUNT);
-        urlList.add("?action=video&sort_desc=rating" + "&limit=" + Constants.COUNT);
-        urlList.add("?action=video&sort_desc=name" + "&limit=" + Constants.COUNT);
-        urlList.add("?action=video&sort_desc=date_premiere" + "&limit=" + Constants.COUNT);
-        urlList.add("?action=video&sort_desc=rating_vote" + "&limit=" + Constants.COUNT);
-
-        for (int i = 0; i < urlList.size(); i++) {
-             collection.add(getAllDataList.getAllDataCallable(urlList.get(i)));
-            Log.d(TAG, "initMultiThread: thread created");
-        }
-
-
-
-
-        /*lastAddedFilmList = getAllDataList.getAllDataCallable("?action=video&sort_desc=added" + "&limit=" + Constants.COUNT);
-        Log.d(TAG, "onCreate: " + lastAddedFilmList.size());
-        byPopularityFilmFilmLists = getAllDataList.getAllDataCallable("?action=video&sort_desc=views_month" + "&limit=" + Constants.COUNT);
-        Log.d(TAG, "onCreate: " + byPopularityFilmFilmLists.size());
-        byViewsFilmLists = getAllDataList.getAllDataCallable("?action=video&sort_desc=views" + "&limit=" + Constants.COUNT);
-        Log.d(TAG, "onCreate: " + byViewsFilmLists.size());
-        byRatingFilmLists = getAllDataList.getAllDataCallable("?action=video&sort_desc=rating" + "&limit=" + Constants.COUNT);
-        Log.d(TAG, "onCreate: " + byRatingFilmLists.size());
-        byNameFilmLists = getAllDataList.getAllDataCallable("?action=video&sort_desc=name" + "&limit=" + Constants.COUNT);
-        Log.d(TAG, "onCreate: " + byNameFilmLists.size());
-        byDatePremiereFilmLists = getAllDataList.getAllDataCallable("?action=video&sort_desc=date_premiere" + "&limit=" + Constants.COUNT);
-        Log.d(TAG, "onCreate: " + byDatePremiereFilmLists.size());
-        estimatedFilmLists = getAllDataList.getAllDataCallable("?action=video&sort_desc=rating_vote" + "&limit=" + Constants.COUNT);
-        Log.d(TAG, "onCreate: "+ estimatedFilmLists.size());
-
-         */
-
-        fillRecyclerView(lastAddedFilmList
-                , lastAddedRecView, lastAddedRecLayManager
-                , lastAddedFilmsDataAdapter, bundleLastAddedFilmList);
-        lastAddedFilmsDataAdapter.notifyDataSetChanged();
-        fillRecyclerView(byPopularityFilmFilmLists, byPopularityFilmRecView, byPopularityFilmRecLayManager,
-                byPopularityFilmDataAdapter, bundleByPopularityFilmFilmLists);
-        byPopularityFilmDataAdapter.notifyDataSetChanged();
-        fillRecyclerView(byViewsFilmLists, byViewsFilmRecView, byViewsFilmRecLayManager
-                , byViewsFilmDataAdapter, bundleByViewsFilmLists);
-        byViewsFilmDataAdapter.notifyDataSetChanged();
-        fillRecyclerView(byRatingFilmLists, byRatingRecView, byRatingRecLayManager
-                , byRatingDataAdapter, bundleByRatingFilmLists);
-        byRatingDataAdapter.notifyDataSetChanged();
-        fillRecyclerView(byNameFilmLists, byNameRecView, byNameRecLayManager
-                , byNameDataAdapter, bundleByNameFilmLists);
-        byNameDataAdapter.notifyDataSetChanged();
-        fillRecyclerView(byDatePremiereFilmLists, byDatePremiereRecView, byDatePremiereRecLayManager
-                , byDatePremiereDataAdapter, bundleByDatePremiereFilmLists);
-        byDatePremiereDataAdapter.notifyDataSetChanged();
-        fillRecyclerView(estimatedFilmLists, estimatedRecView, estimatedRecLayManager
-                , estimatedDataAdapter, bundleEstimatedFilmLists);
-        estimatedDataAdapter.notifyDataSetChanged();
-    }
-
     private void newCategorySort() {
-        getWorldFilms("?action=video&sort_desc=added" + category
-                        + genreID + countryID + yearFromTo
-                        + "&limit=" + Constants.COUNT, getAllDataList
-                , lastAddedFilmList
-                , lastAddedRecView, lastAddedRecLayManager
-                , lastAddedFilmsDataAdapter, bundleLastAddedFilmList);
-        lastAddedFilmsDataAdapter.offset = 0;
-
-        getWorldFilms("?action=video&sort_desc=views_month" + category
-                        + genreID + countryID + yearFromTo
-                        + "&limit=" + Constants.COUNT
-                , getAllDataList
-                , byPopularityFilmFilmLists, byPopularityFilmRecView, byPopularityFilmRecLayManager,
-                byPopularityFilmDataAdapter, bundleByPopularityFilmFilmLists);
-        byPopularityFilmDataAdapter.offset = 0;
-
-        getWorldFilms("?action=video&sort_desc=views" + category
-                        + genreID + countryID + yearFromTo
-                        + "&limit=" + Constants.COUNT
-                , getAllDataList
-                , byViewsFilmLists, byViewsFilmRecView, byViewsFilmRecLayManager
-                , byViewsFilmDataAdapter, bundleByViewsFilmLists);
-        byViewsFilmDataAdapter.offset = 0;
-
-        getWorldFilms("?action=video&sort_desc=rating" + category
-                        + genreID + countryID + yearFromTo
-                        + "&limit=" + Constants.COUNT
-                , getAllDataList
-                , byRatingFilmLists, byRatingRecView, byRatingRecLayManager
-                , byRatingDataAdapter, bundleByRatingFilmLists);
-        byRatingDataAdapter.offset = 0;
-
-        getWorldFilms("?action=video&sort_desc=name" + category
-                        + genreID + countryID + yearFromTo
-                        + "&limit=" + Constants.COUNT
-                , getAllDataList
-                , byNameFilmLists, byNameRecView, byNameRecLayManager
-                , byNameDataAdapter, bundleByNameFilmLists);
-        byNameDataAdapter.offset = 0;
-        getWorldFilms("?action=video&sort_desc=date_premiere" + category
-                        + genreID + countryID + yearFromTo
-                        + "&limit=" + Constants.COUNT
-                , getAllDataList
-                , byDatePremiereFilmLists, byDatePremiereRecView, byDatePremiereRecLayManager
-                , byDatePremiereDataAdapter, bundleByDatePremiereFilmLists);
-        byPopularityFilmDataAdapter.offset = 0;
-
-        getWorldFilms("?action=video&sort_desc=rating_vote" + category
-                        + genreID + countryID + yearFromTo
-                        + "&limit=" + Constants.COUNT
-                , getAllDataList
-                , estimatedFilmLists, estimatedRecView, estimatedRecLayManager
-                , estimatedDataAdapter, bundleEstimatedFilmLists);
-        estimatedDataAdapter.offset = 0;
+        filmViewModel.updateFilmList("?action=video&sort_desc=added" + category
+                + genreID + countryID + yearFromTo
+                + "&limit=" + Constants.COUNT, filmViewModel.getLASTADDED_ID());
+        filmViewModel.updateFilmList("?action=video&sort_desc=views_month" + category
+                + genreID + countryID + yearFromTo
+                + "&limit=" + Constants.COUNT, filmViewModel.getBYPOPULARITY_ID());
+        filmViewModel.updateFilmList("?action=video&sort_desc=views" + category
+                + genreID + countryID + yearFromTo
+                + "&limit=" + Constants.COUNT, filmViewModel.getBYVIEW_ID());
+        filmViewModel.updateFilmList("?action=video&sort_desc=rating" + category
+                + genreID + countryID + yearFromTo
+                + "&limit=" + Constants.COUNT, filmViewModel.getBYRATING_ID());
+        filmViewModel.updateFilmList("?action=video&sort_desc=name" + category
+                + genreID + countryID + yearFromTo
+                + "&limit=" + Constants.COUNT, filmViewModel.getBYNAME_ID());
+        filmViewModel.updateFilmList("?action=video&sort_desc=date_premiere" + category
+                + genreID + countryID + yearFromTo
+                + "&limit=" + Constants.COUNT, filmViewModel.getBYDATEPREMIER_ID());
+        filmViewModel.updateFilmList("?action=video&sort_desc=rating_vote" + category
+                + genreID + countryID + yearFromTo
+                + "&limit=" + Constants.COUNT, filmViewModel.getESTIMATED_ID());
     }
 
-    @SuppressLint("WrongViewCast")
     private void initVariables() {
+        linearLayoutLastAdded = findViewById(R.id.linearLayoutLastAdded);
+        linearLayoutByPopularity = findViewById(R.id.linearLayoutByPopularity);
+        linearLayoutByViews = findViewById(R.id.linearLayoutByViews);
+        linearLayoutByRating = findViewById(R.id.linearLayoutByRating);
+        linearLayoutByName = findViewById(R.id.linearLayoutByName);
+        linearLayoutByDatePremiere = findViewById(R.id.linearLayoutByDatePremiere);
+        linearLayoutEstimated = findViewById(R.id.linearLayoutEstimated);
+
+        linearLayoutLastAdded.setVisibility(View.GONE);
+        linearLayoutByPopularity.setVisibility(View.GONE);
+        linearLayoutByViews.setVisibility(View.GONE);
+        linearLayoutByRating.setVisibility(View.GONE);
+        linearLayoutByName.setVisibility(View.GONE);
+        linearLayoutByDatePremiere.setVisibility(View.GONE);
+        linearLayoutEstimated.setVisibility(View.GONE);
+
+
         getAllDataList = new DataLoaderXML(10);
         settingsManager = new SettingsManager();
+        filmViewModel = new ViewModelProvider(MainActivity.this, new MainViewModelFactory(getApplication())).get(FilmViewModel.class);
+
         genreID = "";
         countryID = "";
         yearFrom = "";
         yearTo = "";
         yearFromTo = "";
         superLayout = findViewById(R.id.superLayout);
-        //TODO need to sign with button
         yearDurationBtn = findViewById(R.id.yearDurationBtn);
         yearDurationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -491,29 +297,6 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
         tvShowBtn = findViewById(R.id.tvShowBtn);
         years = new Years();
 
-        lastAddedRecLayManager = new LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL
-                , false);
-        byPopularityFilmRecLayManager = new LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL
-                , false);
-        byViewsFilmRecLayManager = new LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL
-                , false);
-        byRatingRecLayManager = new LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL
-                , false);
-        byNameRecLayManager = new LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL
-                , false);
-        byDatePremiereRecLayManager = new LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL
-                , false);
-        estimatedRecLayManager = new LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL
-                , false);
-
-
 
         lastAddedFilmList = new ArrayList<>();
         byPopularityFilmFilmLists = new ArrayList<>();
@@ -523,34 +306,24 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
         byDatePremiereFilmLists = new ArrayList<>();
         estimatedFilmLists = new ArrayList<>();
 
-        bundleLastAddedFilmList = new ArrayList<>();
-        bundleByPopularityFilmFilmLists = new ArrayList<>();
-        bundleByViewsFilmLists = new ArrayList<>();
-        bundleByRatingFilmLists = new ArrayList<>();
-        bundleByNameFilmLists = new ArrayList<>();
-        bundleByDatePremiereFilmLists = new ArrayList<>();
-        bundleEstimatedFilmLists = new ArrayList<>();
-
-        updateLastAddedFilmList = new ArrayList<>();
-        updateByPopularityFilmFilmLists = new ArrayList<>();
-        updateByViewsFilmFilmLists = new ArrayList<>();
-        updateByRatingFilmLists = new ArrayList<>();
-        updateByNameFilmLists = new ArrayList<>();
-        updateByDatePremiereFilmLists = new ArrayList<>();
-        updateEstimatedFilmLists = new ArrayList<>();
 
         lastAddedRecView = findViewById(R.id.lastAddedRecView);
-        byPopularityFilmRecView = findViewById(R.id.worldfilmRecView);
-        byViewsFilmRecView = findViewById(R.id.ourfilmRecView);
-        byRatingRecView = findViewById(R.id.animationRecView);
-        byNameRecView = findViewById(R.id.animationSerialRecView);
-        byDatePremiereRecView = findViewById(R.id.worldSerialRecView);
-        estimatedRecView = findViewById(R.id.owrSerialRecView);
+        byPopularityFilmRecView = findViewById(R.id.byPopularityFilmRecView);
+        byViewsFilmRecView = findViewById(R.id.byViewsFilmRecView);
+        byRatingRecView = findViewById(R.id.byRatingRecView);
+        byNameRecView = findViewById(R.id.byNameRecView);
+        byDatePremiereRecView = findViewById(R.id.byDatePremiereRecView);
+        estimatedRecView = findViewById(R.id.estimatedRecView);
 
-        ////////////////////////////////////
+        //TODO check list
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
         lastAddedFilmsDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext()
-                , lastAddedFilmList);
-
+                , filmViewModel.getLastAddedFilmList().getValue());
         lastAddedFilmsDataAdapter.setClickListener(new DataAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -561,15 +334,21 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                updateList(lastAddedFilmsDataAdapter, updateLastAddedFilmList
+                updateList(lastAddedFilmsDataAdapter
                         , lastAddedFilmList, getAllDataList
                         , "?action=video&sort_desc=added" + category
                                 + genreID + countryID + yearFromTo
-                                + "&limit=", bundleLastAddedFilmList);
+                                + "&limit=", filmViewModel.getLASTADDED_ID());
             }
         });
-        /////////////////////////////////////
-        byPopularityFilmDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext(), byPopularityFilmFilmLists);
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        byPopularityFilmDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext()
+                , filmViewModel.getByPopularityFilmFilmLists().getValue());
         byPopularityFilmDataAdapter.setClickListener(new DataAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -580,15 +359,21 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                updateList(byPopularityFilmDataAdapter, updateByPopularityFilmFilmLists
+                updateList(byPopularityFilmDataAdapter
                         , byPopularityFilmFilmLists, getAllDataList
                         , "?action=video&sort_desc=views_month" + category
                                 + genreID + countryID + yearFromTo
-                                + "&limit=", bundleByPopularityFilmFilmLists);
+                                + "&limit=", filmViewModel.getBYPOPULARITY_ID());
             }
         });
-        /////////////////////////////////////
-        byViewsFilmDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext(), byViewsFilmLists);
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        byViewsFilmDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext()
+                , filmViewModel.getByViewsFilmLists().getValue());
         byViewsFilmDataAdapter.setClickListener(new DataAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -599,15 +384,21 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                updateList(byViewsFilmDataAdapter, updateByViewsFilmFilmLists
+                updateList(byViewsFilmDataAdapter
                         , byViewsFilmLists, getAllDataList
                         , "?action=video&sort_desc=views" + category
                                 + genreID + countryID + yearFromTo
-                                + "&limit=", bundleByViewsFilmLists);
+                                + "&limit=", filmViewModel.getBYVIEW_ID());
             }
         });
-        /////////////////////////////////////
-        byRatingDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext(), byRatingFilmLists);
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        byRatingDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext()
+                , filmViewModel.getByRatingFilmLists().getValue());
         byRatingDataAdapter.setClickListener(new DataAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -618,15 +409,21 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                updateList(byRatingDataAdapter, updateByRatingFilmLists
+                updateList(byRatingDataAdapter
                         , byRatingFilmLists, getAllDataList
                         , "?action=video&sort_desc=rating" + category
                                 + genreID + countryID + yearFromTo
-                                + "&limit=", bundleByRatingFilmLists);
+                                + "&limit=", filmViewModel.getBYRATING_ID());
             }
         });
-
-        byNameDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext(), byNameFilmLists);
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        byNameDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext()
+                , filmViewModel.getByNameFilmLists().getValue());
         byNameDataAdapter.setClickListener(new DataAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -638,15 +435,21 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                updateList(byNameDataAdapter, updateByNameFilmLists
+                updateList(byNameDataAdapter
                         , byNameFilmLists, getAllDataList
                         , "?action=video&sort_desc=name" + category
                                 + genreID + countryID + yearFromTo
-                                + "&limit=", bundleByNameFilmLists);
+                                + "&limit=", filmViewModel.getBYNAME_ID());
             }
         });
-
-        byDatePremiereDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext(), byDatePremiereFilmLists);
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        byDatePremiereDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext()
+                , filmViewModel.getByDatePremiereFilmLists().getValue());
         byDatePremiereDataAdapter.setClickListener(new DataAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -658,14 +461,21 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                updateList(byDatePremiereDataAdapter, updateByDatePremiereFilmLists, byDatePremiereFilmLists
+                updateList(byDatePremiereDataAdapter, byDatePremiereFilmLists
                         , getAllDataList
                         , "?action=video&sort_desc=date_premiere" + category
                                 + genreID + countryID + yearFromTo
-                                + "&limit=", bundleByDatePremiereFilmLists);
+                                + "&limit=", filmViewModel.getBYDATEPREMIER_ID());
             }
         });
-        estimatedDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext(), estimatedFilmLists);
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        estimatedDataAdapter = new DataAdapter(this.getBaseContext().getApplicationContext()
+                , filmViewModel.getEstimatedFilmLists().getValue());
         estimatedDataAdapter.setClickListener(new DataAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -673,18 +483,24 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
                 Log.d(TAG, "onItemClick: our serials " + position);
             }
         });
-
         estimatedRecView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                updateList(estimatedDataAdapter, updateEstimatedFilmLists
+                updateList(estimatedDataAdapter
                         , estimatedFilmLists, getAllDataList
                         , "?action=video&sort_desc=rating_vote" + category
                                 + genreID + countryID + yearFromTo
-                                + "&limit=", bundleEstimatedFilmLists);
+                                + "&limit=", filmViewModel.getESTIMATED_ID());
             }
         });
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+        ///////////////////////////////
+
 
 
         searchTV = findViewById(R.id.searchTV);
@@ -856,52 +672,31 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
     }
 
     private void getWorldFilms(String url, DataLoaderXML loaderXML, ArrayList<FilmList> filmListArrayList
-            , RecyclerView recyclerView, RecyclerView.LayoutManager layoutManager, DataAdapter adapter
-            , ArrayList<FilmList> backupFilmListArrayList) {
+            , RecyclerView recyclerView, DataAdapter adapter
+            ) {
         filmListArrayList.clear();
-        filmListArrayList.addAll(loaderXML.getAllDataCallable(url));
-        backupFilmListArrayList.addAll(filmListArrayList);
-        Log.d(TAG, "getWorldFilms: size is " + backupFilmListArrayList.size());
+        //filmListArrayList.addAll(loaderXML.getAllDataCallable(url));
         //dowloadCount.set(num, Integer.valueOf(dowloadCount.get(num) + Constants.COUNT));
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this
+                , LinearLayoutManager.HORIZONTAL
+                , false));
         recyclerView.setHasFixedSize(false);
-        recyclerView.setAdapter(adapter);
+        //recyclerView.setAdapter(adapter);
     }
 
     private void fillRecyclerView(ArrayList<FilmList> filmListArrayList
             , RecyclerView recyclerView, RecyclerView.LayoutManager layoutManager, DataAdapter adapter
             , ArrayList<FilmList> backupFilmListArrayList) {
-        backupFilmListArrayList.addAll(filmListArrayList);
-        Log.d(TAG, "getWorldFilms: size is " + backupFilmListArrayList.size());
-        //dowloadCount.set(num, Integer.valueOf(dowloadCount.get(num) + Constants.COUNT));
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(false);
         recyclerView.setAdapter(adapter);
     }
 
-    private void restoreView(ArrayList<FilmList> backupedFilmList, ArrayList<FilmList> filmList
-            , RecyclerView recyclerView
-            , RecyclerView.LayoutManager layoutManager, DataAdapter adapter) {
-        Log.d(TAG, "restoreView: restoring data");
-        filmList = new ArrayList<>();
-        filmList.addAll(backupedFilmList);
-        adapter = new DataAdapter(this.getBaseContext().getApplicationContext(), filmList);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(false);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
-
-    private ArrayList<FilmList> getNewFilmList(String url, DataLoaderXML loaderXML) {
-        ArrayList<FilmList> arrayList = loaderXML.getAllDataCallable(url);
-        return arrayList;
-    }
-
-    private void updateList(DataAdapter adapter, ArrayList<FilmList> update
+    private void updateList(DataAdapter adapter
             , ArrayList<FilmList> filmList, DataLoaderXML loaderXML, String url
-            , ArrayList<FilmList> backupList /*, RecyclerView recyclerView, int i*/) {
+            , Integer id) {
         if (adapter.getPosition() == adapter.getItemCount() - 1) {
-            if (update != null) {
+            /*if (update != null) {
                 Log.d(TAG, "updateList: adapter is null");
                 update = null;
                 update = new ArrayList<>();
@@ -909,20 +704,121 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
             adapter.offset = adapter.offset + Integer.parseInt(Constants.UPDATE_COUNT);
             update.addAll(getNewFilmList(url + Constants.COUNT + "&offset="
                     + adapter.offset, loaderXML));
-            backupList.addAll(update);
             filmList.addAll(update);
             position = adapter.getItemCount() - 1;
-            adapter.setItems(adapter.getItemCount() - 1);
+            adapter.setItems(adapter.getItemCount() - 1);*/
+            updateViewModelFilmList(url,id);
         }
     }
 
-    private void getGenres(String genreLink) {
-        String str;
-        //DataLoaderXML loaderXML = new DataLoaderXML();
-        Log.d(TAG, "getGenres: " + getAllDataList.toString());
-        str = getAllDataList.getList(genreLink);
-        genreArrayList = getAllDataList.parseGenres(str);
+
+    private void updateViewModelFilmList(String url, Integer id){
+        switch (id) {
+            case 0:
+                filmViewModel.updateFilmList(url,0);
+                break;
+            case 1:
+                filmViewModel.updateFilmList(url,1);
+                break;
+            case 2:
+                filmViewModel.updateFilmList(url,2);
+                break;
+            case 3:
+                filmViewModel.updateFilmList(url,3);
+                break;
+            case 4:
+                filmViewModel.updateFilmList(url,4);
+                break;
+            case 5:
+                filmViewModel.updateFilmList(url,5);
+                break;
+            case 6:
+                filmViewModel.updateFilmList(url,6);
+                break;
+        }
     }
+
+    private void setObservers(){
+        filmViewModel.getGenreArrayList().observe(this, new Observer<ArrayList<Genre>>() {
+            @Override
+            public void onChanged(ArrayList<Genre> genres) {
+                genreArrayList = filmViewModel.getGenreArrayList().getValue();
+                initGenreSpinner();
+            }
+        });
+
+        filmViewModel.getLastAddedFilmList().observe(this, new Observer<ArrayList<FilmList>>() {
+            @Override
+            public void onChanged(ArrayList<FilmList> filmLists) {
+                linearLayoutLastAdded.setVisibility(View.VISIBLE);
+                lastAddedFilmsDataAdapter = new DataAdapter(MainActivity.this
+                        , filmViewModel.getLastAddedFilmList().getValue());
+                lastAddedRecView.setAdapter(lastAddedFilmsDataAdapter);
+                lastAddedFilmsDataAdapter.notifyDataSetChanged();
+            }
+        });
+        filmViewModel.getByDatePremiereFilmLists().observe(this, new Observer<ArrayList<FilmList>>() {
+            @Override
+            public void onChanged(ArrayList<FilmList> filmLists) {
+                linearLayoutByDatePremiere.setVisibility(View.VISIBLE);
+                byDatePremiereDataAdapter = new DataAdapter(MainActivity.this
+                , filmViewModel.getByDatePremiereFilmLists().getValue());
+                byDatePremiereRecView.setAdapter(byDatePremiereDataAdapter);
+                byDatePremiereDataAdapter.notifyDataSetChanged();
+            }
+        });
+        filmViewModel.getByNameFilmLists().observe(this, new Observer<ArrayList<FilmList>>() {
+            @Override
+            public void onChanged(ArrayList<FilmList> filmLists) {
+                linearLayoutByName.setVisibility(View.VISIBLE);
+                byNameDataAdapter = new DataAdapter(MainActivity.this
+                        , filmViewModel.getByNameFilmLists().getValue());
+                byNameRecView.setAdapter(byNameDataAdapter);
+                byNameDataAdapter.notifyDataSetChanged();
+               }
+        });
+        filmViewModel.getByPopularityFilmFilmLists().observe(this, new Observer<ArrayList<FilmList>>() {
+            @Override
+            public void onChanged(ArrayList<FilmList> filmLists) {
+                linearLayoutByPopularity.setVisibility(View.VISIBLE);
+                byPopularityFilmDataAdapter = new DataAdapter(MainActivity.this
+                        , filmViewModel.getByPopularityFilmFilmLists().getValue());
+                byPopularityFilmRecView.setAdapter(byPopularityFilmDataAdapter);
+                byPopularityFilmDataAdapter.notifyDataSetChanged();
+                }
+        });
+        filmViewModel.getByRatingFilmLists().observe(this, new Observer<ArrayList<FilmList>>() {
+            @Override
+            public void onChanged(ArrayList<FilmList> filmLists) {
+                linearLayoutByRating.setVisibility(View.VISIBLE);
+                byRatingDataAdapter = new DataAdapter(MainActivity.this
+                        , filmViewModel.getByRatingFilmLists().getValue());
+                byRatingRecView.setAdapter(byRatingDataAdapter);
+                byRatingDataAdapter.notifyDataSetChanged();
+               }
+        });
+        filmViewModel.getByViewsFilmLists().observe(this, new Observer<ArrayList<FilmList>>() {
+            @Override
+            public void onChanged(ArrayList<FilmList> filmLists) {
+                linearLayoutByViews.setVisibility(View.VISIBLE);
+                byViewsFilmDataAdapter = new DataAdapter(MainActivity.this
+                        , filmViewModel.getByViewsFilmLists().getValue());
+                byViewsFilmRecView.setAdapter(byViewsFilmDataAdapter);
+                byViewsFilmDataAdapter.notifyDataSetChanged();
+                 }
+        });
+        filmViewModel.getEstimatedFilmLists().observe(this, new Observer<ArrayList<FilmList>>() {
+            @Override
+            public void onChanged(ArrayList<FilmList> filmLists) {
+                linearLayoutEstimated.setVisibility(View.VISIBLE);
+                estimatedDataAdapter = new DataAdapter(MainActivity.this
+                        , filmViewModel.getEstimatedFilmLists().getValue());
+                estimatedRecView.setAdapter(estimatedDataAdapter);
+                estimatedDataAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
 
     private void initGenreSpinner() {
         genreID = "";
@@ -961,14 +857,14 @@ public class MainActivity extends AppCompatActivity implements DataDurrationFrag
     }
 
     private void initCountrySpinner() {
-        counrtySpinner = findViewById(R.id.spinnerCountry);
+        countrySpinner = findViewById(R.id.spinnerCountry);
         String[] countriesID = getResources().getStringArray(R.array.countriesid);
         String[] countries = getResources().getStringArray(R.array.countries);
         SpinnerAdapter arrayAdapter = new SpinnerAdapter(this
                 , R.layout.support_simple_spinner_dropdown_item, countries);
-        counrtySpinner.setAdapter(arrayAdapter);
+        countrySpinner.setAdapter(arrayAdapter);
         //counrtySpinner.setSelection(0);
-        counrtySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        countrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (i) {

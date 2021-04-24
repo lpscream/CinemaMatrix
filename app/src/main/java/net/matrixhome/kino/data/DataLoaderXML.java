@@ -3,11 +3,9 @@ package net.matrixhome.kino.data;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,15 +18,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 
 public class DataLoaderXML {
 
     private final String TAG = "DataDownloaderXML";
-    private final Download download = new Download();
-    private final ArrayList<Integer> hidenList = new ArrayList<>();
-    ExecutorService service;
+    private ExecutorService service;
     private int offset = 0;
 
 
@@ -38,7 +33,6 @@ public class DataLoaderXML {
 
 
 
-    //работает в асинк таске, только парсит строку
     public ArrayList<FilmList> parseJSON(String str) {
         Parser parse = new Parser();
         ArrayList<FilmList> film = new ArrayList<>();
@@ -53,20 +47,15 @@ public class DataLoaderXML {
     }
 
 
-    //берем лист без загрузки, только парсит строку
     public ArrayList<FilmList> parseJSONCallable(String str) {
         ArrayList<FilmList> film = new ArrayList<>();
         Future<ArrayList<FilmList>> getFilmListFuture;
         getFilmListFuture = service.submit(new ParseListCallable(str));
-        //3 ждем пока задача выполнится
         try {
             film = getFilmListFuture.get();
         } catch (Exception ie) {
             ie.printStackTrace(System.err);
         }
-
-        //5 останавливаем ThreadPool.
-        //service.shutdown();
         return film;
     }
 
@@ -76,8 +65,6 @@ public class DataLoaderXML {
         Future<ArrayList<FilmList>> getListFuture;
         getListFuture = service.submit(new GEtAllData(url + Constants.API_KEY));
         offset = offset + Integer.parseInt(Constants.UPDATE_COUNT);
-        Log.d(TAG, "getAllDataCallable: " + url);
-        Log.d(TAG, "getAllDataCallable: offset count  is " + offset);
         try {
             film = getListFuture.get();
         } catch (ExecutionException e) {
@@ -328,7 +315,6 @@ public class DataLoaderXML {
         @Override
         protected String doInBackground(String... strings) {
             final String TAG = "myLogs";
-            Log.d(TAG, "doInBackground: " + strings[0]);
             StringBuilder result = new StringBuilder();
             URL url = null;
             HttpURLConnection connection;
@@ -620,46 +606,7 @@ public class DataLoaderXML {
     }
 
 
-   /* private class ParseGson extends AsyncTask<String, Void, ArrayList<FilmList>> {
-        long startTime, endTime;
 
-        @Override
-        protected void onPreExecute() {
-            startTime = SystemClock.elapsedRealtime();
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<FilmList> filmLists) {
-            endTime = SystemClock.elapsedRealtime() - startTime;
-            Log.d("testParser", "onPostExecute: " + endTime);
-            super.onPostExecute(filmLists);
-        }
-
-        @Override
-        protected ArrayList<FilmList> doInBackground(String... strings) {
-            ArrayList<FilmList> arrayList = new ArrayList<>();
-            GsonBuilder builder = new GsonBuilder();
-            Gson gson = builder.create();
-            JSONObject jsonRoot;
-            Log.d(TAG, "doInBackground: " + "start parsing");
-            try {
-                jsonRoot = new JSONObject(strings[0]);
-                JSONArray jsonArray = jsonRoot.getJSONArray("results");
-                String[] array = new String[jsonArray.length()];
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    array[i] = jsonArray.getString(i);
-                }
-                for (int i = 0; i < array.length; i++) {
-                    FilmList filmList = new FilmList();
-                    JSONObject jsonObject = new JSONObject(array[i]);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return arrayList;
-        }
-    }*/
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -907,6 +854,7 @@ class GEtAllData implements Callable<ArrayList<FilmList>> {
     public ArrayList<FilmList> call() throws Exception {
 
         float start = SystemClock.elapsedRealtime();
+        //FilmViewModel filmViewModel = new ViewModelProvider().get(FilmViewModel.class);
         final String TAG = "DataDownloaderXML";
         StringBuilder result = new StringBuilder();
         URL url = null;
@@ -914,7 +862,6 @@ class GEtAllData implements Callable<ArrayList<FilmList>> {
         Log.d(TAG, "call: " + "start downloading");
         try {
             url = new URL(Constants.BASE_URL + str);
-            Log.d(TAG, "call: " + url.toString());
             connection = (HttpURLConnection) url.openConnection();
             //connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
@@ -936,7 +883,6 @@ class GEtAllData implements Callable<ArrayList<FilmList>> {
         float endtime = SystemClock.elapsedRealtime() - start;
         Log.d(TAG, "call: elapsed time " + endtime);
         Log.d(TAG, "call: " + "finish downloading");
-        Log.d(TAG, "call: " + Thread.currentThread().getName());
         //////////////////////////////////////////////////////////////
 
         ArrayList<FilmList> arrayList = new ArrayList<>();
@@ -998,6 +944,7 @@ class GEtAllData implements Callable<ArrayList<FilmList>> {
                 filmList.video_views = k.getString("video_views");
                 filmList.url = k.getString("url");
                 arrayList.add(filmList);
+
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -1052,7 +999,6 @@ class GetJSONObjectArray implements Callable<ArrayList<JSONObject>> {
         Log.d(TAG, "call: " + "start downloading");
         try {
             url = new URL(Constants.BASE_URL + str);
-            Log.d(TAG, "call: " + url.toString());
             connection = (HttpURLConnection) url.openConnection();
             //connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");

@@ -15,7 +15,7 @@
           "value": "x86"
         }
       ],
-      "versionCode": 40,
+      "versionCode": 41,
       "versionName": "1.1",
       "outputFile": "app-x86-release.apk"
     },
@@ -27,7 +27,7 @@
           "value": "armeabi-v7a"
         }
       ],
-      "versionCode": 40,
+      "versionCode": 41,
       "versionName": "1.1",
       "outputFile": "app-armeabi-v7a-release.apk"
     }
