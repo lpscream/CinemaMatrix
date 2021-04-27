@@ -17,7 +17,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/default_icon" />
+        app:srcCompat="@drawable/default_icon"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/shadow_background"/>
 
     <LinearLayout
         android:id="@+id/nameLayout"
@@ -43,6 +45,7 @@
             android:textColor="@color/colorGrey"
             android:textSize="12sp" />
 
+
         <TextView
             android:id="@+id/yearCountryTV"
             android:layout_width="match_parent"
@@ -51,6 +54,12 @@
             android:text="TextView"
             android:textColor="@android:color/tertiary_text_light"
             android:textSize="10sp" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
     </LinearLayout>
 
     <TextView
@@ -59,7 +68,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:background="@color/exo_error_message_background_color"
-        android:text="TextView"
         android:textColor="@color/colorGrey"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/cover"
@@ -71,7 +79,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:background="@color/exo_error_message_background_color"
-        android:text="TextView"
         android:textColor="@color/colorGrey"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/cover"
