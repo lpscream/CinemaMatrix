@@ -38,7 +38,7 @@ import java.util.*
 
 class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelectedDurationListener {
 
-    private val SEARCHRESPONSE: String = "searchResponse"
+    val SEARCHRESPONSE: String = "searchResponse"
     private val TAG: String = "FilmCatalogueActivity_log"
     private var downloadID: Long = 0
 
@@ -373,7 +373,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         filmViewModel.lastAddedFilmList.observe(this, Observer {
             linearLayoutLastAdded.visibility = View.VISIBLE
             if (filmViewModel.updateListState1) {
-                lastAddedFilmsDataAdapter = DataAdapter(this, filmViewModel.lastAddedFilmList.value!!)
+                lastAddedFilmsDataAdapter = DataAdapter(this, filmViewModel.lastAddedFilmList.value!!, filmViewModel)
                 lastAddedRecView.adapter = lastAddedFilmsDataAdapter
                 lastAddedFilmsDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.lastAddedFilmList.value!!, position)
@@ -385,7 +385,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         filmViewModel.byPopularityFilmFilmLists.observe(this, Observer {
             linearLayoutByPopularity.visibility = View.VISIBLE
             if (filmViewModel.updateListState2) {
-                byPopularityFilmDataAdapter = DataAdapter(this, filmViewModel.byPopularityFilmFilmLists.value!!)
+                byPopularityFilmDataAdapter = DataAdapter(this, filmViewModel.byPopularityFilmFilmLists.value!!, filmViewModel)
                 byPopularityFilmRecView.adapter = byPopularityFilmDataAdapter
                 byPopularityFilmDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byPopularityFilmFilmLists.value!!, position)
@@ -397,7 +397,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         filmViewModel.byViewsFilmLists.observe(this, Observer {
             linearLayoutByViews.visibility = View.VISIBLE
             if (filmViewModel.updateListState3) {
-                byViewsFilmDataAdapter = DataAdapter(this, filmViewModel.byViewsFilmLists.value!!)
+                byViewsFilmDataAdapter = DataAdapter(this, filmViewModel.byViewsFilmLists.value!!, filmViewModel)
                 byViewsFilmRecView.adapter = byViewsFilmDataAdapter
                 byViewsFilmDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byViewsFilmLists.value!!, position)
@@ -409,7 +409,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         filmViewModel.byRatingFilmLists.observe(this, Observer {
             linearLayoutByRating.visibility = View.VISIBLE
             if (filmViewModel.updateListState4) {
-                byRatingDataAdapter = DataAdapter(this, filmViewModel.byRatingFilmLists.value!!)
+                byRatingDataAdapter = DataAdapter(this, filmViewModel.byRatingFilmLists.value!!, filmViewModel)
                 byRatingRecView.adapter = byRatingDataAdapter
                 byRatingDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byRatingFilmLists.value!!, position)
@@ -421,7 +421,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         filmViewModel.byNameFilmLists.observe(this, Observer {
             linearLayoutByName.visibility = View.VISIBLE
             if (filmViewModel.updateListState5) {
-                byNameDataAdapter = DataAdapter(this, filmViewModel.byNameFilmLists.value!!)
+                byNameDataAdapter = DataAdapter(this, filmViewModel.byNameFilmLists.value!!, filmViewModel)
                 byNameRecView.adapter = byNameDataAdapter
                 byNameDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byNameFilmLists.value!!, position)
@@ -433,7 +433,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         filmViewModel.byDatePremiereFilmLists.observe(this, Observer {
             linearLayoutByDatePremiere.visibility = View.VISIBLE
             if (filmViewModel.updateListState6) {
-                byDatePremiereDataAdapter = DataAdapter(this, filmViewModel.byDatePremiereFilmLists.value!!)
+                byDatePremiereDataAdapter = DataAdapter(this, filmViewModel.byDatePremiereFilmLists.value!!, filmViewModel)
                 byDatePremiereRecView.adapter = byDatePremiereDataAdapter
                 byDatePremiereDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byDatePremiereFilmLists.value!!, position)
@@ -445,7 +445,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         filmViewModel.estimatedFilmLists.observe(this, Observer {
             linearLayoutEstimated.visibility = View.VISIBLE
             if (filmViewModel.updateListState7) {
-                estimatedDataAdapter = DataAdapter(this, filmViewModel.estimatedFilmLists.value!!)
+                estimatedDataAdapter = DataAdapter(this, filmViewModel.estimatedFilmLists.value!!, filmViewModel)
                 estimatedRecView.adapter = estimatedDataAdapter
                 estimatedDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.estimatedFilmLists.value!!, position)
@@ -555,18 +555,6 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 }
             }
         })
-
-        lastAddedRecView.layoutManager = object: LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL, false){
-            override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
-                if (direction == View.FOCUS_RIGHT) {
-                    val pos = getPosition(focused)
-                    if (pos == itemCount - 1)
-                        return focused
-                }
-                return super.onInterceptFocusSearch(focused, direction)
-            }
-        }
         byPopularityFilmRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -815,7 +803,4 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         var alert: AlertDialog =builder.create()
         alert.show()
     }
-
-
-
 }

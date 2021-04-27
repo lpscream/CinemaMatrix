@@ -8,17 +8,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
 
 import net.matrixhome.kino.BuildConfig;
 import net.matrixhome.kino.R;
 import net.matrixhome.kino.gui.FilmCatalogueActivity;
-import net.matrixhome.kino.gui.MainActivity;
-import net.matrixhome.kino.viewmodel.FilmViewModel;
 
 import java.io.BufferedReader;
 import java.io.File;

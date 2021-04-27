@@ -87,6 +87,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
     val BYDATEPREMIER_ID: Int = 5
     val ESTIMATED_ID: Int = 6
 
+
     var lastAppVersion = MutableLiveData<Int>()
 
     //array to add new film list to database

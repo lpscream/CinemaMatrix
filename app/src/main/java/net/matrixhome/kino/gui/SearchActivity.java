@@ -69,12 +69,12 @@ public class SearchActivity extends AppCompatActivity {
         //loader = new DataLoaderXML(3);
         current = 0;
         Intent searchResponse = getIntent();
-        searchTV.setText(searchResponse.getStringExtra(MainActivity.SEARCHRESPONSE));
+        searchTV.setText(searchResponse.getStringExtra(Constants.SEARCHRESPONSE));
         dataLoaderXML = new DataLoaderXML(3);
         searchResult = new ArrayList();
         filmName = findViewById(R.id.filmNameSearch);
         cover = findViewById(R.id.coverSearchDiscription);
-        getWorldFilms(searchResponse.getStringExtra(MainActivity.SEARCHRESPONSE), searchResult);
+        getWorldFilms(searchResponse.getStringExtra(Constants.SEARCHRESPONSE), searchResult);
 
         Log.d(TAG, "onCreate: ends");
 

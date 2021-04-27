@@ -15,6 +15,7 @@ import com.squareup.picasso.Target;
 
 import net.matrixhome.kino.R;
 import net.matrixhome.kino.data.FilmList;
+import net.matrixhome.kino.viewmodel.FilmViewModel;
 
 import java.util.ArrayList;
 
@@ -31,16 +32,19 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     private ItemClickListener mClickListener;
     private View.OnScrollChangeListener onMyScrollListener;
     private int pos;
+    private FilmViewModel filmViewModel;
 
 
-    DataAdapter(Context context, ArrayList<FilmList> films) {
+    DataAdapter(Context context, ArrayList<FilmList> films, FilmViewModel filmViewModel) {
         this.filmLists = films;
         this.inflater = LayoutInflater.from(context);
         this.cntx = context;
+        this.filmViewModel = filmViewModel;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateViewHolder: viewType " + viewType);
         View v = inflater.inflate(R.layout.listview, parent, false);
         return new ViewHolder(v);
     }
@@ -48,6 +52,8 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        if (position == getItemCount() - 1)
+            Log.d(TAG, "onBindViewHolder: current update position " + position);
         if (filmLists.get(position).serial_name != "null") {
             holder.filmName.setText(filmLists.get(position).serial_name);
         } else {
