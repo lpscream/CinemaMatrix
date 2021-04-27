@@ -63,25 +63,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    //exoplayer implementation
-    def exoVersion = '2.11.5'
-    /*implementation project(':exoplayer-' + exoVersion +'library-core')
-    implementation project(':exoplayer-' + exoVersion +'library-core')
-    implementation project(':exoplayer-' + exoVersion +'library-dash')//
-    implementation project(':exoplayer-' + exoVersion + 'library-ui')
-    implementation project(':exoplayer-' + exoVersion + 'extension-okhttp')
-    implementation project(':exoplayer-' + exoVersion + 'extension-ffmpeg')
-    implementation project(path: ':exoplayer-' + exoVersion + 'library-smoothstreaming')
-    implementation project(path: ':exoplayer-' + exoVersion + 'library-hls')
-    implementation project(':exoplayer-' + exoVersion + 'library')
-    implementation project(':exoplayer-' + exoVersion + 'extension-mediasession')//
-*/
-    // Base implementation with a standard SeekBar
-    implementation 'com.github.rubensousa:previewseekbar:3.0.0'
-
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.12.0'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.0'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.13.3'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.13.3'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.13.3'
 
 
     //picture downloader
