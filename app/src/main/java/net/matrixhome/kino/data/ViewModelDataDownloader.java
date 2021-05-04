@@ -21,18 +21,70 @@ import java.util.concurrent.Executors;
 public class ViewModelDataDownloader {
     private final String TAG = "ViewModelDataDownloader";
 
-    public ArrayList<FilmList> getAllData(String url){
-        return downloadAndParse(url);
+    public ArrayList<FilmList> getAllData(String strUrl){
+        return parseFilmLIst(downloadStr(strUrl));
     }
 
-    public ArrayList<FilmList> downloadAndParse(String strUrl){
+    public ArrayList<Genre> getAllGenres(String genresUrl){
+        final String TAG = "myLogs";
+        StringBuilder result = new StringBuilder();
+        URL url = null;
+        HttpURLConnection connection;
+        Log.d(TAG, "doInBackground: " + "start downloading");
+        try {
+            url = new URL(Constants.BASE_URL + genresUrl + Constants.API_KEY);
+            connection = (HttpURLConnection) url.openConnection();
+            //connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+            //connection.setConnectTimeout(1000);
+            InputStreamReader isr = new InputStreamReader(connection.getInputStream());
+            BufferedReader reader = new BufferedReader(isr);
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                result.append(line);
+            }
+
+            connection.disconnect();
+            url = null;
+            connection = null;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ArrayList<Genre> arrayList = new ArrayList<>();
+        JSONObject jsonRoot;
+        try {
+            jsonRoot = new JSONObject(String.valueOf(result));
+            JSONArray jsonArray = jsonRoot.getJSONArray("results");
+            String[] array = new String[jsonArray.length()];
+            for (int i = 0; i < jsonArray.length(); i++) {
+                array[i] = jsonArray.getString(i);
+            }
+            for (int i = 0; i < array.length; i++) {
+                Genre genreList = new Genre();
+                JSONObject jsonObject = new JSONObject(array[i]);
+                genreList.id = jsonObject.getInt("id");
+                genreList.title = jsonObject.getString("title");
+                genreList.category = jsonObject.getString("category");
+                arrayList.add(genreList);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return arrayList;
+    }
+
+
+    private String downloadStr(String host){
         float start = SystemClock.elapsedRealtime();
         StringBuilder result = new StringBuilder();
         URL url = null;
         HttpURLConnection connection;
         Log.d(TAG, "call: " + "start downloading");
         try {
-            url = new URL(Constants.BASE_URL + strUrl + Constants.API_KEY);
+            url = new URL(Constants.BASE_URL + host + Constants.API_KEY);
             Log.d(TAG, "call: " + url.toString());
             connection = (HttpURLConnection) url.openConnection();
             //connection.setRequestMethod("GET");
@@ -58,11 +110,16 @@ public class ViewModelDataDownloader {
         Log.d(TAG, "call: " + Thread.currentThread().getName());
         //////////////////////////////////////////////////////////////
 
+        return result.toString();
+    }
+
+    private ArrayList<FilmList> parseFilmLIst(String string){
+        float start = SystemClock.elapsedRealtime();
         ArrayList<FilmList> arrayList = new ArrayList<>();
         JSONObject jsonRoot;
         FilmList filmList = new FilmList();
         try {
-            jsonRoot = new JSONObject(result.toString());
+            jsonRoot = new JSONObject(string);
             JSONArray jsonArray = jsonRoot.getJSONArray("results");
             ArrayList<JSONObject> jsonObjectArrayList = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -146,59 +203,12 @@ public class ViewModelDataDownloader {
                 }
             }
         }
+        float endtime = SystemClock.elapsedRealtime() - start;
+        Log.d(TAG, "call: elapsed time " + endtime);
+        Log.d(TAG, "call: " + "finish parsing");
+        Log.d(TAG, "call: " + Thread.currentThread().getName());
+        //////////////////////////////////////////////////////////////
         endtime = SystemClock.elapsedRealtime() - start;
         Log.d(TAG, "call: elapsed time " + endtime);
-        return arrayList;
-    }
-
-    public ArrayList<Genre> getAllGenres(String genresUrl){
-        final String TAG = "myLogs";
-        StringBuilder result = new StringBuilder();
-        URL url = null;
-        HttpURLConnection connection;
-        Log.d(TAG, "doInBackground: " + "start downloading");
-        try {
-            url = new URL(Constants.BASE_URL + genresUrl + Constants.API_KEY);
-            connection = (HttpURLConnection) url.openConnection();
-            //connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
-            //connection.setConnectTimeout(1000);
-            InputStreamReader isr = new InputStreamReader(connection.getInputStream());
-            BufferedReader reader = new BufferedReader(isr);
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
-
-            connection.disconnect();
-            url = null;
-            connection = null;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        ArrayList<Genre> arrayList = new ArrayList<>();
-        JSONObject jsonRoot;
-        try {
-            jsonRoot = new JSONObject(String.valueOf(result));
-            JSONArray jsonArray = jsonRoot.getJSONArray("results");
-            String[] array = new String[jsonArray.length()];
-            for (int i = 0; i < jsonArray.length(); i++) {
-                array[i] = jsonArray.getString(i);
-            }
-            for (int i = 0; i < array.length; i++) {
-                Genre genreList = new Genre();
-                JSONObject jsonObject = new JSONObject(array[i]);
-                genreList.id = jsonObject.getInt("id");
-                genreList.title = jsonObject.getString("title");
-                genreList.category = jsonObject.getString("category");
-                arrayList.add(genreList);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return arrayList;
-    }
+        return arrayList;}
 }

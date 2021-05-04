@@ -90,11 +90,11 @@ class VideoPlayer : AppCompatActivity() {
         playerControlView.player = player
         Log.d(TAG, "initializePlayer: " + intent.getBooleanExtra("isSerial", false))
         if (intent.getBooleanExtra("isSerial", false)) {
-            currentSeasonNumber = intent.getStringExtra("currentSeasonNumber").toInt()
-            currentEpisodeNumber = intent.getStringExtra("currentEpisodeNumber").toInt()
+            currentSeasonNumber = intent.getStringExtra("currentSeasonNumber")!!.toInt()
+            currentEpisodeNumber = intent.getStringExtra("currentEpisodeNumber")!!.toInt()
             Log.d(TAG, "initializePlayer: " + currentSeasonNumber)
             Log.d(TAG, "initializePlayer: " + currentEpisodeNumber)
-            seriesCount = intent.getStringExtra("seriesCount").toInt()
+            seriesCount = intent.getStringExtra("seriesCount")!!.toInt()
             Log.d(TAG, "initializePlayer: seriesCount " + seriesCount)
             episodeNumberFromVideoView.text = resources.getString(R.string.episode) + " " + currentEpisodeNumber
             nameTVfromVideoView.text = intent.getStringExtra("name")
@@ -150,7 +150,7 @@ class VideoPlayer : AppCompatActivity() {
         player.playWhenReady = false
         if (Util.SDK_INT < 24) {
             if (playerView != null) {
-                //playerView.onPause()
+                playerView.onPause()
             }
         }
         Log.d(TAG, "onPause: ")
@@ -161,7 +161,7 @@ class VideoPlayer : AppCompatActivity() {
         player.playWhenReady = false
         if (Util.SDK_INT >= 24) {
             if (playerView != null) {
-                //playerView.onPause()
+                playerView.onPause()
             }
         }
         Log.d(TAG, "onStop: ")

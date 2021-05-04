@@ -14,8 +14,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,6 +43,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
     private var downloadID: Long = 0
 
     private var updateStatus = true
+    private var sortBtnState = false
 
     private lateinit var settingsManager: SettingsManager
     private lateinit var checkService: CheckService
@@ -71,6 +72,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
     private lateinit var serialBtn: Button
     private lateinit var animSerialBtn: Button
     private lateinit var tvShowBtn: Button
+    private lateinit var sortVarButton: ImageButton
 
     private lateinit var progressBar: ProgressBar
 
@@ -90,6 +92,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
     private lateinit var byDatePremiereRecView: RecyclerView
     private lateinit var estimatedRecView: RecyclerView
 
+
     private lateinit var lastAddedFilmsDataAdapter: DataAdapter
     private lateinit var byPopularityFilmDataAdapter: DataAdapter
     private lateinit var byViewsFilmDataAdapter: DataAdapter
@@ -102,21 +105,19 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
     private lateinit var searchTV: EditText
     private lateinit var datePickerFragment: DataDurrationFragmnet
 
-    private lateinit var filmViewModel:FilmViewModel
-
-
+    private lateinit var filmViewModel: FilmViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if (!Connection.hasConnection(applicationContext)){
+        if (!Connection.hasConnection(applicationContext)) {
             var intent = Intent(application, ConnectionActivity::class.java)
             startActivity(intent)
         }
 
         checkService = CheckService()
-        if (!checkService.check()){
+        if (!checkService.check()) {
             finish()
         }
 
@@ -129,7 +130,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         setLayoutsGone()
         setLinearLayoutsToRecyclerView()
         setOnClickListeners()
-        setOnScrollListeners()
+        //setOnScrollListeners()
         setObservers()
         initCountrySpinner()
         setSearchTvOnKeyListener()
@@ -137,8 +138,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
     }
 
     private fun setOnIterceptFocusSearch() {
-        lastAddedRecView.layoutManager = object: LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL, false){
+        lastAddedRecView.layoutManager = object : LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
             override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
                 if (direction == View.FOCUS_RIGHT) {
                     val pos = getPosition(focused)
@@ -149,8 +149,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
             }
         }
 
-        byPopularityFilmRecView.layoutManager = object: LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL, false){
+        byPopularityFilmRecView.layoutManager = object : LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
             override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
                 if (direction == View.FOCUS_RIGHT) {
                     val pos = getPosition(focused)
@@ -160,8 +159,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 return super.onInterceptFocusSearch(focused, direction)
             }
         }
-        byViewsFilmRecView.layoutManager = object: LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL, false){
+        byViewsFilmRecView.layoutManager = object : LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
             override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
                 if (direction == View.FOCUS_RIGHT) {
                     val pos = getPosition(focused)
@@ -171,8 +169,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 return super.onInterceptFocusSearch(focused, direction)
             }
         }
-        byRatingRecView.layoutManager = object: LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL, false){
+        byRatingRecView.layoutManager = object : LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
             override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
                 if (direction == View.FOCUS_RIGHT) {
                     val pos = getPosition(focused)
@@ -182,8 +179,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 return super.onInterceptFocusSearch(focused, direction)
             }
         }
-        byNameRecView.layoutManager = object: LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL, false){
+        byNameRecView.layoutManager = object : LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
             override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
                 if (direction == View.FOCUS_RIGHT) {
                     val pos = getPosition(focused)
@@ -193,8 +189,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 return super.onInterceptFocusSearch(focused, direction)
             }
         }
-        byDatePremiereRecView.layoutManager = object: LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL, false){
+        byDatePremiereRecView.layoutManager = object : LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
             override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
                 if (direction == View.FOCUS_RIGHT) {
                     val pos = getPosition(focused)
@@ -204,8 +199,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 return super.onInterceptFocusSearch(focused, direction)
             }
         }
-        estimatedRecView.layoutManager = object: LinearLayoutManager(this
-                , LinearLayoutManager.HORIZONTAL, false){
+        estimatedRecView.layoutManager = object : LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
             override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
                 if (direction == View.FOCUS_RIGHT) {
                     val pos = getPosition(focused)
@@ -234,16 +228,16 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 var line: String
                 line = genre[p2].toString()
-                for (j in 0..(filmViewModel.genreArrayList.value!!.size - 1)){
-                    if (filmViewModel.genreArrayList.value!!.get(j).title.equals(line)){
+                for (j in 0..(filmViewModel.genreArrayList.value!!.size - 1)) {
+                    if (filmViewModel.genreArrayList.value!!.get(j).title.equals(line)) {
                         stringBuilder.append("&genre_id[]=").append(filmViewModel.genreArrayList.value!!.get(j).id)
                     }
                 }
                 filmViewModel.genreID.value = stringBuilder.toString()
-                if (stringBuilder.length > 0){
+                if (stringBuilder.length > 0) {
                     stringBuilder.setLength(0)
                 }
-                if (genreSpinnerFlag){
+                if (genreSpinnerFlag) {
                     //update new list of films
                     filmViewModel.getNewSortedFilList()
                     setLayoutsGone()
@@ -259,20 +253,20 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         }
     }
 
-    private fun initCountrySpinner(){
+    private fun initCountrySpinner() {
         countrySpinner = findViewById(R.id.spinnerCountry)
         var countries = resources.getStringArray(R.array.countries)
         var spinnerAdapter: SpinnerAdapter = SpinnerAdapter(this,
                 R.layout.support_simple_spinner_dropdown_item, countries)
         countrySpinner.adapter = spinnerAdapter
-        countrySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        countrySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                when(p2){
+                when (p2) {
                     0 -> filmViewModel.countryID.value = ""
                     1 -> filmViewModel.countryID.value = "&made=our"
                     2 -> filmViewModel.countryID.value = "&made=foreign"
                 }
-                if (countrySpinnerFlag){
+                if (countrySpinnerFlag) {
                     //update film list
                     filmViewModel.getNewSortedFilList()
                     setLayoutsGone()
@@ -308,6 +302,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         serialBtn = findViewById(R.id.serialBtn)
         animSerialBtn = findViewById(R.id.animSerialBtn)
         tvShowBtn = findViewById(R.id.tvShowBtn)
+        sortVarButton = findViewById(R.id.sort_var_button)
 
         years = Years()
 
@@ -334,7 +329,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
 
     }
 
-    private fun setLayoutsGone(){
+    private fun setLayoutsGone() {
         linearLayoutLastAdded.visibility = View.GONE
         linearLayoutByPopularity.visibility = View.GONE
         linearLayoutByViews.visibility = View.GONE
@@ -344,11 +339,11 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         linearLayoutEstimated.visibility = View.GONE
     }
 
-    private fun setSearchTvOnKeyListener(){
-        searchTV.setOnKeyListener(View.OnKeyListener{ view: View, i: Int, keyEvent: KeyEvent ->
-            when(i){
+    private fun setSearchTvOnKeyListener() {
+        searchTV.setOnKeyListener(View.OnKeyListener { view: View, i: Int, keyEvent: KeyEvent ->
+            when (i) {
                 KeyEvent.KEYCODE_ENTER -> {
-                    if (searchTV.text.toString().length > 2){
+                    if (searchTV.text.toString().length > 2) {
                         startSearchActivity(searchTV.text.toString())
                         return@OnKeyListener true
                     }
@@ -369,89 +364,106 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         startActivity(intent)
     }
 
-    private fun setObservers(){
+    private fun setObservers() {
         filmViewModel.lastAddedFilmList.observe(this, Observer {
+            Log.d(TAG, "setObservers: a")
             linearLayoutLastAdded.visibility = View.VISIBLE
             if (filmViewModel.updateListState1) {
-                lastAddedFilmsDataAdapter = DataAdapter(this, filmViewModel.lastAddedFilmList.value!!, filmViewModel)
+                lastAddedFilmsDataAdapter = DataAdapter(this, filmViewModel.lastAddedFilmList.value!!, filmViewModel, Constants.LAST_ADDED_ID)
                 lastAddedRecView.adapter = lastAddedFilmsDataAdapter
                 lastAddedFilmsDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.lastAddedFilmList.value!!, position)
                 })
             }
-            lastAddedFilmsDataAdapter.notifyItemRangeInserted(filmViewModel.lastAddedItemsCount, filmViewModel.lastAddedFilmList.value!!.size)
+            //lastAddedFilmsDataAdapter.notifyDataSetChanged()
+            lastAddedFilmsDataAdapter.notifyItemRangeChanged(filmViewModel.lastAddedItemsCount, filmViewModel.lastAddedFilmList.value!!.size)
             filmViewModel.updateListState1 = false
         })
         filmViewModel.byPopularityFilmFilmLists.observe(this, Observer {
+            Log.d(TAG, "setObservers: a")
             linearLayoutByPopularity.visibility = View.VISIBLE
             if (filmViewModel.updateListState2) {
-                byPopularityFilmDataAdapter = DataAdapter(this, filmViewModel.byPopularityFilmFilmLists.value!!, filmViewModel)
+                byPopularityFilmDataAdapter = DataAdapter(this, filmViewModel.byPopularityFilmFilmLists.value!!, filmViewModel, Constants.BY_POPULARITY_ID)
                 byPopularityFilmRecView.adapter = byPopularityFilmDataAdapter
                 byPopularityFilmDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byPopularityFilmFilmLists.value!!, position)
                 })
             }
-            byPopularityFilmDataAdapter.notifyItemRangeInserted(filmViewModel.byPopularityItemsCount, filmViewModel.byPopularityFilmFilmLists.value!!.size)
+            //byPopularityFilmDataAdapter.notifyDataSetChanged()
+            byPopularityFilmDataAdapter.notifyItemRangeChanged(filmViewModel.byPopularityItemsCount, filmViewModel.byPopularityFilmFilmLists.value!!.size)
             filmViewModel.updateListState2 = false
         })
         filmViewModel.byViewsFilmLists.observe(this, Observer {
             linearLayoutByViews.visibility = View.VISIBLE
             if (filmViewModel.updateListState3) {
-                byViewsFilmDataAdapter = DataAdapter(this, filmViewModel.byViewsFilmLists.value!!, filmViewModel)
+                byViewsFilmDataAdapter = DataAdapter(this, filmViewModel.byViewsFilmLists.value!!, filmViewModel, Constants.BY_VIEWS_ID)
                 byViewsFilmRecView.adapter = byViewsFilmDataAdapter
                 byViewsFilmDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byViewsFilmLists.value!!, position)
                 })
             }
-            byViewsFilmDataAdapter.notifyItemRangeInserted(filmViewModel.byViewsItemsCount, filmViewModel.byViewsFilmLists.value!!.size)
+            //byViewsFilmDataAdapter.notifyDataSetChanged()
+            byViewsFilmDataAdapter.notifyItemRangeChanged(filmViewModel.byViewsItemsCount, filmViewModel.byViewsFilmLists.value!!.size)
             filmViewModel.updateListState3 = false
         })
         filmViewModel.byRatingFilmLists.observe(this, Observer {
+            Log.d(TAG, "setObservers: a")
+
             linearLayoutByRating.visibility = View.VISIBLE
             if (filmViewModel.updateListState4) {
-                byRatingDataAdapter = DataAdapter(this, filmViewModel.byRatingFilmLists.value!!, filmViewModel)
+                byRatingDataAdapter = DataAdapter(this, filmViewModel.byRatingFilmLists.value!!, filmViewModel, Constants.BY_RATING_ID)
                 byRatingRecView.adapter = byRatingDataAdapter
                 byRatingDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byRatingFilmLists.value!!, position)
                 })
             }
-            byRatingDataAdapter.notifyItemRangeInserted(filmViewModel.byRatingItemsCount, filmViewModel.byRatingFilmLists.value!!.size)
+            //byRatingDataAdapter.notifyDataSetChanged()
+            byRatingDataAdapter.notifyItemRangeChanged(filmViewModel.byRatingItemsCount, filmViewModel.byRatingFilmLists.value!!.size)
             filmViewModel.updateListState4 = false
         })
         filmViewModel.byNameFilmLists.observe(this, Observer {
+            Log.d(TAG, "setObservers: a")
+
             linearLayoutByName.visibility = View.VISIBLE
             if (filmViewModel.updateListState5) {
-                byNameDataAdapter = DataAdapter(this, filmViewModel.byNameFilmLists.value!!, filmViewModel)
+                byNameDataAdapter = DataAdapter(this, filmViewModel.byNameFilmLists.value!!, filmViewModel, Constants.BY_NAME_ID)
                 byNameRecView.adapter = byNameDataAdapter
                 byNameDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byNameFilmLists.value!!, position)
                 })
             }
-            byNameDataAdapter.notifyItemRangeInserted(filmViewModel.byNameItemsCount, filmViewModel.byNameFilmLists.value!!.size)
+            //byNameDataAdapter.notifyDataSetChanged()
+            byNameDataAdapter.notifyItemRangeChanged(filmViewModel.byNameItemsCount, filmViewModel.byNameFilmLists.value!!.size)
             filmViewModel.updateListState5 = false
         })
         filmViewModel.byDatePremiereFilmLists.observe(this, Observer {
+            Log.d(TAG, "setObservers: a")
+
             linearLayoutByDatePremiere.visibility = View.VISIBLE
             if (filmViewModel.updateListState6) {
-                byDatePremiereDataAdapter = DataAdapter(this, filmViewModel.byDatePremiereFilmLists.value!!, filmViewModel)
+                byDatePremiereDataAdapter = DataAdapter(this, filmViewModel.byDatePremiereFilmLists.value!!, filmViewModel, Constants.BY_DATE_ID)
                 byDatePremiereRecView.adapter = byDatePremiereDataAdapter
                 byDatePremiereDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.byDatePremiereFilmLists.value!!, position)
                 })
             }
-            byDatePremiereDataAdapter.notifyItemRangeInserted(filmViewModel.byDateItemsCount, filmViewModel.byDatePremiereFilmLists.value!!.size)
+            //byDatePremiereDataAdapter.notifyDataSetChanged()
+            byDatePremiereDataAdapter.notifyItemRangeChanged(filmViewModel.byDateItemsCount, filmViewModel.byDatePremiereFilmLists.value!!.size)
             filmViewModel.updateListState6 = false
         })
         filmViewModel.estimatedFilmLists.observe(this, Observer {
+            Log.d(TAG, "setObservers: a")
+
             linearLayoutEstimated.visibility = View.VISIBLE
             if (filmViewModel.updateListState7) {
-                estimatedDataAdapter = DataAdapter(this, filmViewModel.estimatedFilmLists.value!!, filmViewModel)
+                estimatedDataAdapter = DataAdapter(this, filmViewModel.estimatedFilmLists.value!!, filmViewModel, Constants.ESTIMATED_ID)
                 estimatedRecView.adapter = estimatedDataAdapter
                 estimatedDataAdapter.setClickListener(DataAdapter.ItemClickListener { view, position ->
                     startDescriptionActivity(filmViewModel.estimatedFilmLists.value!!, position)
                 })
             }
-            estimatedDataAdapter.notifyItemRangeInserted(filmViewModel.estimatedItemsCount, filmViewModel.estimatedFilmLists.value!!.size)
+            //estimatedDataAdapter.notifyDataSetChanged()
+            estimatedDataAdapter.notifyItemRangeChanged(filmViewModel.estimatedItemsCount, filmViewModel.estimatedFilmLists.value!!.size)
             filmViewModel.updateListState7 = false
         })
 
@@ -460,7 +472,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         })
     }
 
-    private fun setLinearLayoutsToRecyclerView(){
+    private fun setLinearLayoutsToRecyclerView() {
         lastAddedRecView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         byPopularityFilmRecView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         byViewsFilmRecView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -470,7 +482,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         estimatedRecView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
     }
 
-    private fun notifyAllDataSetChanged(){
+    private fun notifyAllDataSetChanged() {
         lastAddedFilmsDataAdapter.notifyDataSetChanged()
         byPopularityFilmDataAdapter.notifyDataSetChanged()
         byViewsFilmDataAdapter.notifyDataSetChanged()
@@ -480,7 +492,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         estimatedDataAdapter.notifyDataSetChanged()
     }
 
-    private fun setOnClickListeners(){
+    private fun setOnClickListeners() {
         filmsBtn.setOnClickListener {
             filmViewModel.genreID.value = ""
             filmViewModel.countryID.value = ""
@@ -535,9 +547,40 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
             setLayoutsGone()
             notifyAllDataSetChanged()
         }
+
+        sortVarButton.setOnClickListener {
+            if (sortBtnState) {
+                sortVarButton.background = ContextCompat.getDrawable(this, R.drawable.sort_desc_variant_button_selector)
+                filmViewModel.sort_variant_added.value = "&sort_desc=added"
+                filmViewModel.sort_variant_views_month.value = "&sort_desc=views_month"
+                filmViewModel.sort_variant_views.value = "&sort_desc=views"
+                filmViewModel.sort_variant_rating.value = "&sort_desc=rating"
+                filmViewModel.sort_variant_name.value = "&sort_desc=name"
+                filmViewModel.sort_variant_date_premiere.value = "&sort_desc=date_premiere"
+                filmViewModel.sort_variant_rating_vote.value = "&sort_desc=rating_vote"
+                filmViewModel.getNewSortedFilList()
+                setLayoutsGone()
+                notifyAllDataSetChanged()
+                sortBtnState = false
+            } else {
+                sortVarButton.background = ContextCompat.getDrawable(this, R.drawable.sort_variant_button_selector)
+                filmViewModel.sort_variant_added.value = "&sort=added"
+                filmViewModel.sort_variant_views_month.value = "&sort=views_month"
+                filmViewModel.sort_variant_views.value = "&sort=views"
+                filmViewModel.sort_variant_rating.value = "&sort=rating"
+                filmViewModel.sort_variant_name.value = "&sort=name"
+                filmViewModel.sort_variant_date_premiere.value = "&sort=date_premiere"
+                filmViewModel.sort_variant_rating_vote.value = "&sort=rating_vote"
+                filmViewModel.getNewSortedFilList()
+                setLayoutsGone()
+                notifyAllDataSetChanged()
+                sortBtnState = true
+            }
+
+        }
     }
 
-    private fun setOnScrollListeners(){
+    private fun setOnScrollListeners() {
         lastAddedRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -546,7 +589,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                     filmViewModel.lastAddedItemsCount = filmViewModel.lastAddedFilmList.value!!.size
                     addNewItemToRecyclerView(lastAddedFilmsDataAdapter,
                             filmViewModel.ACTION_VIDEO
-                                    + filmViewModel.SORT_DESC_ADDED
+                                    + filmViewModel.sort_variant_added
                                     + filmViewModel.category.value.toString()
                                     + filmViewModel.genreID.value.toString()
                                     + filmViewModel.countryID.value.toString()
@@ -564,7 +607,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                     filmViewModel.byPopularityItemsCount = filmViewModel.byPopularityFilmFilmLists.value!!.size
                     addNewItemToRecyclerView(byPopularityFilmDataAdapter,
                             filmViewModel.ACTION_VIDEO
-                                    + filmViewModel.SORT_DESC_VIEWS_MONTH
+                                    + filmViewModel.sort_variant_views_month
                                     + filmViewModel.category.value.toString()
                                     + filmViewModel.genreID.value.toString()
                                     + filmViewModel.countryID.value.toString()
@@ -581,7 +624,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
                     filmViewModel.byViewsItemsCount = filmViewModel.byViewsFilmLists.value!!.size
                     addNewItemToRecyclerView(byViewsFilmDataAdapter, filmViewModel.ACTION_VIDEO
-                            + filmViewModel.SORT_DESC_VIEWS
+                            + filmViewModel.sort_variant_views
                             + filmViewModel.category.value.toString()
                             + filmViewModel.genreID.value.toString()
                             + filmViewModel.countryID.value.toString()
@@ -596,7 +639,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
                     filmViewModel.byRatingItemsCount = filmViewModel.byRatingFilmLists.value!!.size
                     addNewItemToRecyclerView(byRatingDataAdapter, filmViewModel.ACTION_VIDEO
-                            + filmViewModel.SORT_DESC_RATING
+                            + filmViewModel.sort_variant_rating
                             + filmViewModel.category.value.toString()
                             + filmViewModel.genreID.value.toString()
                             + filmViewModel.countryID.value.toString()
@@ -613,7 +656,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
                     filmViewModel.byNameItemsCount = filmViewModel.byNameFilmLists.value!!.size
                     addNewItemToRecyclerView(byNameDataAdapter, filmViewModel.ACTION_VIDEO
-                            + filmViewModel.SORT_DESC_NAME
+                            + filmViewModel.sort_variant_name
                             + filmViewModel.category.value.toString()
                             + filmViewModel.genreID.value.toString()
                             + filmViewModel.countryID.value.toString()
@@ -630,7 +673,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
                     filmViewModel.byDateItemsCount = filmViewModel.byDatePremiereFilmLists.value!!.size
                     addNewItemToRecyclerView(byDatePremiereDataAdapter, filmViewModel.ACTION_VIDEO
-                            + filmViewModel.SORT_DESC_DATE_PREMIERE
+                            + filmViewModel.sort_variant_date_premiere
                             + filmViewModel.category.value.toString()
                             + filmViewModel.genreID.value.toString()
                             + filmViewModel.countryID.value.toString()
@@ -647,7 +690,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
                     filmViewModel.estimatedItemsCount = filmViewModel.estimatedFilmLists.value!!.size
                     addNewItemToRecyclerView(estimatedDataAdapter, filmViewModel.ACTION_VIDEO
-                            + filmViewModel.SORT_DESC_RATING_VOTE
+                            + filmViewModel.sort_variant_rating_vote
                             + filmViewModel.category.value.toString()
                             + filmViewModel.genreID.value.toString()
                             + filmViewModel.countryID.value.toString()
@@ -659,11 +702,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
     }
 
     private fun addNewItemToRecyclerView(adapter: DataAdapter, url: String, id: Int, newState: Int) {
-        Log.d(TAG, "////////////////////////////////////////////////////////////")
-        Log.d(TAG, "addNewItemToRecyclerView: newState " + newState)
-        Log.d(TAG, "addNewItemToRecyclerView: position " + adapter.position)
-        Log.d(TAG, "addNewItemToRecyclerView: count " + adapter.itemCount)
-        if (adapter.position == (adapter.itemCount - 1)){
+        if (adapter.position == (adapter.itemCount - 1)) {
             filmViewModel.updateFilmList(url, id)
         }
     }
@@ -685,9 +724,9 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         //needs to get ARRAY with trailers
         //intent.putExtra("trailer_urls", filmArray[position].trailer_urls)
         intent.putExtra("serial_id", filmArray[position].serial_id)
-        if (filmArray[position].serial_id.equals("null", true)){
+        if (filmArray[position].serial_id.equals("null", true)) {
             intent.putExtra("isSerial", false)
-        }else{
+        } else {
             intent.putExtra("isSerial", true)
         }
         intent.putExtra("serial_count_seasons", filmArray[position].serial_count_seasons)
@@ -703,6 +742,22 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
         startActivity(intent)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        filmViewModel.updateListState1 = true
+        filmViewModel.updateListState2 = true
+        filmViewModel.updateListState3 = true
+        filmViewModel.updateListState4 = true
+        filmViewModel.updateListState5 = true
+        filmViewModel.updateListState6 = true
+        filmViewModel.updateListState7 = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+    }
+
     override fun onDurationSelected(durationString: String) {
         filmViewModel.yearFromTo.value = durationString
         filmViewModel.getNewSortedFilList()
@@ -711,23 +766,23 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
     }
 
 
-    fun checkUpdates(){
+    fun checkUpdates() {
         getLastAppVersion()
         filmViewModel.lastAppVersion.observe(this, Observer {
-            if (updateStatus){
-            if (it == 0) {
-                return@Observer
-            }
-            if (it <= BuildConfig.VERSION_CODE) {
-                return@Observer
-            }
-            var lastVersionNumber: String? = SettingsManager.get(applicationContext, "LastIgnoredUpdateVersion")
-            if (lastVersionNumber != null) {
-                var liInt: Int = lastVersionNumber.toInt()
-                if (liInt >= filmViewModel.lastAppVersion.value!!)
+            if (updateStatus) {
+                if (it == 0) {
                     return@Observer
-            }
-            updateApplication(it)
+                }
+                if (it <= BuildConfig.VERSION_CODE) {
+                    return@Observer
+                }
+                var lastVersionNumber: String? = SettingsManager.get(applicationContext, "LastIgnoredUpdateVersion")
+                if (lastVersionNumber != null) {
+                    var liInt: Int = lastVersionNumber.toInt()
+                    if (liInt >= filmViewModel.lastAppVersion.value!!)
+                        return@Observer
+                }
+                updateApplication(it)
             }
             updateStatus = false
         })
@@ -735,7 +790,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
     }
 
 
-    private fun getLastAppVersion(){
+    private fun getLastAppVersion() {
         var coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
         coroutineScope.launch {
             try {
@@ -748,7 +803,7 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                     filmViewModel.lastAppVersion.postValue(str!!.toInt())
                 }
                 inStream.close()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.d(TAG, "getLastAppVersion error: " + e.message)
             }
 
@@ -795,12 +850,12 @@ class FilmCatalogueActivity : AppCompatActivity(), DataDurrationFragmnet.OnSelec
                     dialogInterface.dismiss()
                 })
                 .setNegativeButton("Нет", DialogInterface.OnClickListener { dialogInterface, i ->
-                    Log.d(TAG, "updateApplication: click no button" )
+                    Log.d(TAG, "updateApplication: click no button")
 
-                    WindowCompat.setDecorFitsSystemWindows(window, false)
+                    //WindowCompat.setDecorFitsSystemWindows(window, false)
                     SettingsManager.put(applicationContext, "LastIgnoredUpdateVersion", lastAppVersion.toString())
                 })
-        var alert: AlertDialog =builder.create()
+        var alert: AlertDialog = builder.create()
         alert.show()
     }
 }

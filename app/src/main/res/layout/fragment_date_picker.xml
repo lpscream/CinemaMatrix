@@ -5,8 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:background="@color/exo_gray"
-    tools:context=".gui.DatePickerFragment">
+    android:background="@color/exo_styled_error_message_background">
 
     <LinearLayout
         android:layout_width="match_parent"

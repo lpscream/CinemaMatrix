@@ -5,7 +5,7 @@
     android:id="@+id/superLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".gui.MainActivity">
+    tools:context=".gui.FilmCatalogueActivity">
 
 
     <ProgressBar
@@ -47,6 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:weightSum="4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -94,9 +95,21 @@
             android:id="@+id/yearDurationBtn"
             android:layout_width="match_parent"
             android:layout_height="44dp"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:background="@drawable/gradient_year_duration_button_selector"
+            android:scaleType="fitXY" />
+
+        <ImageButton
+            android:id="@+id/sort_var_button"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/sort_desc_variant_button_selector"
             android:scaleType="fitXY" />
     </LinearLayout>
 
@@ -125,6 +138,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+
                 <TextView
                     android:id="@+id/lastAddedTV"
                     android:layout_width="wrap_content"
@@ -134,7 +148,6 @@
                     android:layout_marginBottom="4dp"
                     android:text="@string/byDateAdded"
                     android:textSize="18sp" />
-
 
                 <net.matrixhome.kino.gui.CustomRecyclerView
                     android:id="@+id/lastAddedRecView"

@@ -28,6 +28,16 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
     var query = MutableLiveData<String>()
     var position = MutableLiveData<Int>()
 
+    var sort_variant_added = MutableLiveData<String>()
+    var sort_variant_views_month = MutableLiveData<String>()
+    var sort_variant_views = MutableLiveData<String>()
+    var sort_variant_rating = MutableLiveData<String>()
+    var sort_variant_name = MutableLiveData<String>()
+    var sort_variant_date_premiere = MutableLiveData<String>()
+    var sort_variant_rating_vote = MutableLiveData<String>()
+
+
+
     private var update_lastAddedFilmList = ArrayList<FilmList>()
     private var update_byPopularityFilmFilmLists = ArrayList<FilmList>()
     private var update_byViewsFilmLists = ArrayList<FilmList>()
@@ -66,14 +76,8 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
 
     val ACTION_VIDEO = "?action=video"
 
-    val SORT_DESC_ADDED = "&sort_desc=added"
-    val SORT_DESC_VIEWS_MONTH = "&sort_desc=views_month"
-    val SORT_DESC_VIEWS = "&sort_desc=views"
-    val SORT_DESC_RATING = "&sort_desc=rating"
-    val SORT_DESC_NAME = "&sort_desc=name"
-    val SORT_DESC_DATE_PREMIERE = "&sort_desc=date_premiere"
-    val SORT_DESC_RATING_VOTE = "&sort_desc=rating_vote"
-    val LIMIT = "&limit="
+
+    var LIMIT = "&limit="
 
 
     var genreArrayList = MutableLiveData<ArrayList<Genre>>()
@@ -102,7 +106,13 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
 
-
+        sort_variant_added.value = "&sort_desc=added"
+        sort_variant_views_month.value = "&sort_desc=views_month"
+        sort_variant_views.value = "&sort_desc=views"
+        sort_variant_rating.value = "&sort_desc=rating"
+        sort_variant_name.value = "&sort_desc=name"
+        sort_variant_date_premiere.value = "&sort_desc=date_premiere"
+        sort_variant_rating_vote.value = "&sort_desc=rating_vote"
 
         genreID.value = ""
         category.value = ""
@@ -116,7 +126,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         getAllDataOnStart()
     }
 
-    public fun getNewSortedFilList(){
+    fun getNewSortedFilList(){
         clearAllData()
         resetOffset()
         resetUpdateListaState()
@@ -181,7 +191,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         coroutineThread.launch {
             update_lastAddedFilmList.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
-                    + SORT_DESC_ADDED
+                    + sort_variant_added.value
                     + category.value
                     + genreID.value
                     + countryID.value
@@ -193,7 +203,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         coroutineThread.launch {
             update_byPopularityFilmFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
-                    + SORT_DESC_VIEWS_MONTH
+                    + sort_variant_views_month.value
                     + category.value
                     + genreID.value
                     + countryID.value
@@ -205,7 +215,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         coroutineThread.launch {
             update_byViewsFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
-                    + SORT_DESC_VIEWS
+                    + sort_variant_views.value
                     + category.value
                     + genreID.value
                     + countryID.value
@@ -217,7 +227,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         coroutineThread.launch {
             update_byRatingFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
-                    + SORT_DESC_RATING
+                    + sort_variant_rating.value
                     + category.value
                     + genreID.value
                     + countryID.value
@@ -229,7 +239,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         coroutineThread.launch {
             update_byNameFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
-                    + SORT_DESC_NAME
+                    + sort_variant_name.value
                     + category.value
                     + genreID.value
                     + countryID.value
@@ -241,7 +251,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         coroutineThread.launch {
             update_byDatePremiereFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
-                    + SORT_DESC_DATE_PREMIERE
+                    + sort_variant_date_premiere.value
                     + category.value
                     + genreID.value
                     + countryID.value
@@ -253,7 +263,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         coroutineThread.launch {
             update_estimatedFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
-                    + SORT_DESC_RATING_VOTE
+                    + sort_variant_rating_vote.value
                     + category.value
                     + genreID.value
                     + countryID.value
@@ -303,6 +313,81 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+
+    fun updateListByID(id: Int){
+            when(id){
+                LASTADDED_ID -> {
+                    updateFilmList(ACTION_VIDEO
+                    + sort_variant_added.value
+                    + category.value
+                    + genreID.value
+                    + countryID.value
+                    + yearFromTo.value
+                    + LIMIT
+                    , LASTADDED_ID)
+                }
+                BYPOPULARITY_ID -> {
+                    updateFilmList(ACTION_VIDEO
+                            + sort_variant_views_month.value
+                            + category.value
+                            + genreID.value
+                            + countryID.value
+                            + yearFromTo.value
+                            + LIMIT
+                            , BYPOPULARITY_ID)
+                }
+                BYVIEW_ID -> {
+                    updateFilmList(ACTION_VIDEO
+                            + sort_variant_views.value
+                            + category.value
+                            + genreID.value
+                            + countryID.value
+                            + yearFromTo.value
+                            + LIMIT
+                            , BYVIEW_ID)
+                }
+                BYRATING_ID -> {
+                    updateFilmList(ACTION_VIDEO
+                            + sort_variant_rating.value
+                            + category.value
+                            + genreID.value
+                            + countryID.value
+                            + yearFromTo.value
+                            + LIMIT
+                            , BYRATING_ID)
+                }
+                BYNAME_ID -> {
+                    updateFilmList(ACTION_VIDEO
+                            + sort_variant_name.value
+                            + category.value
+                            + genreID.value
+                            + countryID.value
+                            + yearFromTo.value
+                            + LIMIT
+                            , BYNAME_ID)
+                }
+                BYDATEPREMIER_ID -> {
+                    updateFilmList(ACTION_VIDEO
+                            + sort_variant_date_premiere.value
+                            + category.value
+                            + genreID.value
+                            + countryID.value
+                            + yearFromTo.value
+                            + LIMIT
+                            , BYDATEPREMIER_ID)
+                }
+                ESTIMATED_ID -> {
+                    updateFilmList(ACTION_VIDEO
+                            + sort_variant_rating_vote.value
+                            + category.value
+                            + genreID.value
+                            + countryID.value
+                            + yearFromTo.value
+                            + LIMIT
+                            , ESTIMATED_ID)
+                }
+            }
+    }
 }
 
 

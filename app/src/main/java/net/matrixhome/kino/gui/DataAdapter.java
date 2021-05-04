@@ -33,13 +33,15 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     private View.OnScrollChangeListener onMyScrollListener;
     private int pos;
     private FilmViewModel filmViewModel;
+    private Integer id;
 
 
-    DataAdapter(Context context, ArrayList<FilmList> films, FilmViewModel filmViewModel) {
+    DataAdapter(Context context, ArrayList<FilmList> films, FilmViewModel filmViewModel, Integer id) {
         this.filmLists = films;
         this.inflater = LayoutInflater.from(context);
         this.cntx = context;
         this.filmViewModel = filmViewModel;
+        this.id = id;
     }
 
     @Override
@@ -52,8 +54,10 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if (position == getItemCount() - 1)
-            Log.d(TAG, "onBindViewHolder: current update position " + position);
+        if (position == getItemCount() - 5) {
+            filmViewModel.updateListByID(id);
+            Log.d(TAG, "onBindViewHolder: " + "id " + id + " current update position " + position);
+        }
         if (filmLists.get(position).serial_name != "null") {
             holder.filmName.setText(filmLists.get(position).serial_name);
         } else {
@@ -70,25 +74,20 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    //Log.d(TAG, "onFocusChange: " + holder.getAdapterPosition());
                     v.animate().scaleX(1.1f).scaleY(1.1f).setDuration(200).start();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         v.setElevation(20);
                     }
-
-                    Log.d(TAG, "onFocusChange: " + position);
-                    //Log.d(TAG, "onFocusChange: bigger");
                 } else {
                     v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         v.setElevation(0);
                     }
-                    //Log.d(TAG, "onFocusChange: smaller");
                 }
             }
         });
 
-
+/*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             holder.itemView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
                 @Override
@@ -96,6 +95,8 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                 }
             });
         }
+
+ */
         pos = position;
     }
 

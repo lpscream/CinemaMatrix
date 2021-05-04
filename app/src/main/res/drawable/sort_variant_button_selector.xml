@@ -16,9 +16,9 @@
                 </shape>
             </item>
 
-            <item android:width="80dp" android:height="40dp" android:gravity="center">
+            <item android:width="40dp" android:height="40dp" android:gravity="center">
 
-                <bitmap android:gravity="fill_horizontal|fill_vertical|center" android:src="@drawable/year_duration" />
+                <bitmap android:gravity="fill_horizontal|fill_vertical|center" android:src="@drawable/arrow_up_icon" />
             </item>
         </layer-list>
     </item>
@@ -40,9 +40,9 @@
                 </shape>
             </item>
 
-            <item android:width="80dp" android:height="40dp" android:gravity="center">
+            <item android:width="40dp" android:height="40dp" android:gravity="center">
 
-                <bitmap android:gravity="fill_horizontal|fill_vertical|center" android:src="@drawable/year_duration" />
+                <bitmap android:gravity="fill_horizontal|fill_vertical|center" android:src="@drawable/arrow_up_icon" />
             </item>
         </layer-list>
     </item>

@@ -5,7 +5,7 @@
     android:id="@+id/superLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".gui.MainActivity">
+    tools:context=".gui.FilmCatalogueActivity">
 
     <LinearLayout
         android:id="@+id/searchlayout"
@@ -16,7 +16,7 @@
         android:layout_marginEnd="8dp"
         android:orientation="horizontal"
         android:visibility="visible"
-        android:weightSum="20"
+        android:weightSum="22"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -26,10 +26,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="8"
+            android:hint="@string/search"
             android:maxLines="1"
             android:minLines="1"
             android:singleLine="true"
-            android:hint="@string/search"
             android:textSize="12sp" />
 
         <Spinner
@@ -75,9 +75,19 @@
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_marginStart="4dp"
-            android:layout_weight="4"
+            android:layout_weight="3"
             android:background="@drawable/gradient_year_duration_button_selector"
             android:scaleType="fitXY" />
+
+        <ImageButton
+            android:id="@+id/sort_var_button"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="3"
+            android:background="@drawable/sort_desc_variant_button_selector"
+            android:scaleType="fitStart" />
+
     </LinearLayout>
 
 
