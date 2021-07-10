@@ -27,36 +27,12 @@ public class ViewModelDataDownloader {
 
     public ArrayList<Genre> getAllGenres(String genresUrl){
         final String TAG = "myLogs";
-        StringBuilder result = new StringBuilder();
-        URL url = null;
-        HttpURLConnection connection;
-        Log.d(TAG, "doInBackground: " + "start downloading");
-        try {
-            url = new URL(Constants.BASE_URL + genresUrl + Constants.API_KEY);
-            connection = (HttpURLConnection) url.openConnection();
-            //connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
-            //connection.setConnectTimeout(1000);
-            InputStreamReader isr = new InputStreamReader(connection.getInputStream());
-            BufferedReader reader = new BufferedReader(isr);
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
 
-            connection.disconnect();
-            url = null;
-            connection = null;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         ArrayList<Genre> arrayList = new ArrayList<>();
         JSONObject jsonRoot;
         try {
-            jsonRoot = new JSONObject(String.valueOf(result));
+            jsonRoot = new JSONObject(downloadStr(genresUrl));
             JSONArray jsonArray = jsonRoot.getJSONArray("results");
             String[] array = new String[jsonArray.length()];
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -170,6 +146,12 @@ public class ViewModelDataDownloader {
                 filmList.serial_views = k.getString("serial_views");
                 filmList.video_views = k.getString("video_views");
                 filmList.url = k.getString("url");
+                /*if (filmList.cover.startsWith("https://")){
+                    filmList.cover.replace("https", "http");
+                }
+                if (filmList.cover_200.startsWith("https://")){
+                    filmList.cover_200.replace("https", "http");
+                }*/
                 arrayList.add(filmList);
 
             }

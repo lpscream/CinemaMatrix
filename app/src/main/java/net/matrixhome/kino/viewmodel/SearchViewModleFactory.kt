@@ -1,10 +1,11 @@
 package net.matrixhome.kino.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class MainViewModelFactory():ViewModelProvider.Factory {
+class SearchViewModleFactory :ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return FilmViewModel() as T
+        return SearchViewModel() as T
     }
 }

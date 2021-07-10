@@ -5,8 +5,17 @@
     android:id="@+id/superLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".gui.FilmCatalogueActivity">
+    tools:context=".gui.MainActivity">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/testRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBtnsLinearLayout" />
     <LinearLayout
         android:id="@+id/searchlayout"
         android:layout_width="0dp"
@@ -30,7 +39,8 @@
             android:maxLines="1"
             android:minLines="1"
             android:singleLine="true"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:focusable="false"/>
 
         <Spinner
             android:id="@+id/spinnerGenre"
@@ -98,15 +108,22 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:overScrollMode="ifContentScrolls"
-        android:weightSum="5"
-        app:layout_constraintBottom_toTopOf="@id/filmScrollView"
+        android:weightSum="6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchlayout">
 
         <Button
+            android:id="@+id/allFilmsBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/main_menu_btn_selector"
+            android:text="@string/all_films" />
+
+        <Button
             android:id="@+id/filmsBtn"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/main_menu_btn_selector"
@@ -115,7 +132,7 @@
 
         <Button
             android:id="@+id/animBtn"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/main_menu_btn_selector"
@@ -124,7 +141,7 @@
 
         <Button
             android:id="@+id/serialBtn"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/main_menu_btn_selector"
@@ -133,7 +150,7 @@
 
         <Button
             android:id="@+id/animSerialBtn"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/main_menu_btn_selector"
@@ -142,7 +159,7 @@
 
         <Button
             android:id="@+id/tvShowBtn"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/main_menu_btn_selector"
@@ -162,6 +179,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/linearLayoutByPopularity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/worldfilmTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/byPopularity"
+                    android:textSize="18sp" />
+
+                <net.matrixhome.kino.gui.CustomRecyclerView
+                    android:id="@+id/byPopularityFilmRecView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/linearLayoutLastAdded"
@@ -186,52 +228,6 @@
                     android:orientation="horizontal" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/linearLayoutByPopularity"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/worldfilmTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/byPopularity"
-                    android:textSize="18sp" />
-
-                <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/byPopularityFilmRecView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal" />
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/linearLayoutByViews"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/ourfilmTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/byViews"
-                    android:textSize="18sp" />
-
-                <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/byViewsFilmRecView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal" />
-            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/linearLayoutByRating"
@@ -257,28 +253,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/linearLayoutByName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/animationSerialTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/byName"
-                    android:textSize="18sp" />
-
-                <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/byNameRecView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/linearLayoutByDatePremiere"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -300,50 +274,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/linearLayoutEstimated"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/owrSerialTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/estimated"
-                    android:textSize="18sp" />
-
-                <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/estimatedRecView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/tvshowsTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/tv_shows"
-                    android:textSize="18sp" />
-
-                <net.matrixhome.kino.gui.CustomRecyclerView
-                    android:id="@+id/tvshowsRecView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
-            </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

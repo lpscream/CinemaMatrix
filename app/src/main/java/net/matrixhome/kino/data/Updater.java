@@ -14,7 +14,7 @@ import android.util.Log;
 
 import net.matrixhome.kino.BuildConfig;
 import net.matrixhome.kino.R;
-import net.matrixhome.kino.gui.FilmCatalogueActivity;
+import net.matrixhome.kino.gui.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,7 +31,7 @@ public class Updater{
     private Context context;
     public long downloadID;
 
-    public Updater(FilmCatalogueActivity activity){
+    public Updater(MainActivity activity){
         this.context = activity;
     }
 

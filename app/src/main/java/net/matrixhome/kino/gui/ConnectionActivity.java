@@ -16,7 +16,7 @@ public class ConnectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
-        intent = new Intent(this, FilmCatalogueActivity.class);
+        intent = new Intent(this, MainActivity.class);
         AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionActivity.this);
         builder.setTitle(R.string.app_name)
                 .setMessage(R.string.hasNoConnection)

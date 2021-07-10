@@ -39,7 +39,10 @@
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true"
         tools:targetApi="n">
-        <activity android:name=".gui.FilmCatalogueActivity">
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true" />
+        <activity android:name=".gui.MainActivity">
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN"
@@ -56,9 +59,6 @@
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|keyboard|screenLayout|uiMode" /> <!-- android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|keyboard|screenLayout|uiMode" -->
         <activity
             android:name=".gui.SearchActivity"
-            android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|keyboard|screenLayout|uiMode" /> <!-- android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|keyboard|screenLayout|uiMode" -->
-        <activity
-            android:name=".gui.VideoActivity"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|keyboard|screenLayout|uiMode" /> <!-- android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|keyboard|screenLayout|uiMode" -->
         <activity
             android:name=".gui.DescriptionActivity"

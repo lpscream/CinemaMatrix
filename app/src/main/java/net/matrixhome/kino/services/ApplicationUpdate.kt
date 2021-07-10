@@ -1,8 +1,6 @@
 package net.matrixhome.kino.services
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.CoroutineScope
@@ -11,17 +9,17 @@ import kotlinx.coroutines.launch
 import net.matrixhome.kino.BuildConfig
 import net.matrixhome.kino.data.Constants
 import net.matrixhome.kino.data.SettingsManager
-import net.matrixhome.kino.gui.FilmCatalogueActivity
+import net.matrixhome.kino.gui.MainActivity
 import net.matrixhome.kino.viewmodel.FilmViewModel
 import net.matrixhome.kino.viewmodel.MainViewModelFactory
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URL
 
-class ApplicationUpdate(val activity: FilmCatalogueActivity) {
+class ApplicationUpdate(val activity: MainActivity) {
     private val TAG = "ApplicationUpdate_log"
 
-    var filmViewModel:FilmViewModel = ViewModelProvider(activity, MainViewModelFactory(activity.application!!)).get(FilmViewModel::class.java)
+    var filmViewModel:FilmViewModel = ViewModelProvider(activity, MainViewModelFactory()).get(FilmViewModel::class.java)
 
 
     fun checkUpdates(){

@@ -2,7 +2,6 @@ package net.matrixhome.kino.gui
 
 import android.content.Context
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
@@ -41,7 +40,8 @@ private lateinit var player: SimpleExoPlayer
 private lateinit var mediaItem: MediaItem
 private lateinit var mediaSources: ArrayList<MediaItem>
 private lateinit var playerControlView: PlayerControlView
-private var playbackStateListener: VideoPlayer.PlaybackStateListener = VideoPlayer.PlaybackStateListener()
+private var playbackStateListener: VideoPlayer.PlaybackStateListener =
+    VideoPlayer.PlaybackStateListener()
 
 private lateinit var nameTVfromVideoView: TextView
 private lateinit var nameLayoutDescription: ConstraintLayout
@@ -53,19 +53,19 @@ private var seriesCount: Int = 0
 private var currentSeasonNumber: Int = 0
 private var currentEpisodeNumber: Int = 0
 private lateinit var dataLoaderXml: DataLoaderXML
-private lateinit var params: WindowManager.LayoutParams
-private val TAG = "videoActivity_log_kotlin"
+private val TAG = "VideoPlayer_log"
+
 
 class VideoPlayer : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_video)
+        setContentView(R.layout.video_player_fragment)
         win = window
         isSerial = intent.getBooleanExtra("isSerial", false)
         main = this
-        params = window.attributes
+        //params = window.attributes
         link = intent.getStringExtra("link")
         Log.d(TAG, "onCreate: " + link)
         nameTVfromVideoView = findViewById(R.id.nameTVfromVideoView)
@@ -76,7 +76,8 @@ class VideoPlayer : AppCompatActivity() {
         dataLoaderXml = DataLoaderXML(3)
 
         //playbackStateListener = PlaybackStateListener()
-        playerView = findViewById(R.id.exoVideoView)
+        playerView = findViewById(R.id.player_view)
+
         initializePlayer()
         setAllListeners()
     }
@@ -96,14 +97,22 @@ class VideoPlayer : AppCompatActivity() {
             Log.d(TAG, "initializePlayer: " + currentEpisodeNumber)
             seriesCount = intent.getStringExtra("seriesCount")!!.toInt()
             Log.d(TAG, "initializePlayer: seriesCount " + seriesCount)
-            episodeNumberFromVideoView.text = resources.getString(R.string.episode) + " " + currentEpisodeNumber
+            episodeNumberFromVideoView.text =
+                resources.getString(R.string.episode) + " " + currentEpisodeNumber
             nameTVfromVideoView.text = intent.getStringExtra("name")
             for (i in 1..seriesCount) {
                 //links.set(i - 1, dataLoaderXml.getSerialLinkByID(currentSeasonNumber.toString(), i.toString()))
                 Log.d(TAG, "onCreate: currentSeasonNumber")
                 Log.d(TAG, "initializePlayer:  i = " + i)
                 //Log.d(TAG, "onCreate: " + links[i - 1])
-                mediaSources.add(MediaItem.fromUri(dataLoaderXml.getSerialLinkByID(currentSeasonNumber.toString(), i.toString())))
+                mediaSources.add(
+                    MediaItem.fromUri(
+                        dataLoaderXml.getSerialLinkByID(
+                            currentSeasonNumber.toString(),
+                            i.toString()
+                        )
+                    )
+                )
                 player.addMediaItem(mediaSources.get(i - 1))
             }
             player.seekTo(currentEpisodeNumber - 1, C.TIME_UNSET)
@@ -114,6 +123,9 @@ class VideoPlayer : AppCompatActivity() {
             mediaItem = MediaItem.fromUri(link)
             player.setMediaItem(mediaItem)
             nameTVfromVideoView.text = intent.getStringExtra("name")
+            playerView.setShowNextButton(false)
+            playerView.setShowPreviousButton(false)
+
         }
         player.addListener(playbackStateListener)
         player.playWhenReady = true
@@ -147,6 +159,7 @@ class VideoPlayer : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        player.pause()
         player.playWhenReady = false
         if (Util.SDK_INT < 24) {
             if (playerView != null) {
@@ -158,6 +171,7 @@ class VideoPlayer : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        player.stop()
         player.playWhenReady = false
         if (Util.SDK_INT >= 24) {
             if (playerView != null) {
@@ -168,9 +182,9 @@ class VideoPlayer : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        releasePlayer()
         super.onDestroy()
         Log.d(TAG, "onDestroy: ")
-        releasePlayer()
     }
 
     override fun onStart() {
@@ -185,17 +199,16 @@ class VideoPlayer : AppCompatActivity() {
         super.onResume()
         Log.d(TAG, "onResume: ")
         hideSystemUI()
-        /* if (Util.SDK_INT < 24 || player is SimpleExoPlayer) {
-             initializePlayer()
-             if (playerView != null) {
-                 playerView.onResume()
-             }
-         }*/
+        if (Util.SDK_INT < 24 || player is SimpleExoPlayer) {
+            //initializePlayer()
+            if (playerView != null) {
+                playerView.onResume()
+            }
+        }
     }
 
     private fun hideSystemUI() {
         playerView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
-
     }
 
     fun backPressed() {
@@ -205,6 +218,8 @@ class VideoPlayer : AppCompatActivity() {
     private fun releasePlayer() {
         if (player != null) {
             playWhenReady = player.playWhenReady
+            player.stop()
+            player.playWhenReady = false
             playbackPosition = player.currentPosition
             currentWindow = player.currentWindowIndex
             player.removeListener(playbackStateListener)
@@ -226,7 +241,7 @@ class VideoPlayer : AppCompatActivity() {
                 }
             }
             KeyEvent.KEYCODE_DPAD_LEFT -> {
-                if (nameLayoutDescription.visibility == View.VISIBLE) {
+                if (nameLayoutDescription.visibility != View.VISIBLE) {
                     player.seekTo(player.contentPosition + 15000)
                 }
             }
@@ -262,8 +277,12 @@ class VideoPlayer : AppCompatActivity() {
     }
 
     class PlaybackStateListener : EventListener {
-        override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
-            episodeNumberFromVideoView.text = main.resources.getString(R.string.episode) + " " + (player.currentWindowIndex + 1)
+        override fun onTracksChanged(
+            trackGroups: TrackGroupArray,
+            trackSelections: TrackSelectionArray
+        ) {
+            episodeNumberFromVideoView.text =
+                main.resources.getString(R.string.episode) + " " + (player.currentWindowIndex + 1)
             if (!playerView.isControllerVisible) {
                 playerView.showController()
             }
@@ -278,7 +297,10 @@ class VideoPlayer : AppCompatActivity() {
                     if (isSerial) {
                         Log.d(TAG, "onPlaybackStateChanged: serial, check media item count")
                         if (player.currentWindowIndex + 1 == seriesCount)
-                            Log.d(TAG, "onPlaybackStateChanged: media iten count is end, finish activity")
+                            Log.d(
+                                TAG,
+                                "onPlaybackStateChanged: media iten count is end, finish activity"
+                            )
                         //TODO needs onBackPressed
                         win.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                         playerView.showController()
@@ -295,7 +317,6 @@ class VideoPlayer : AppCompatActivity() {
                 SimpleExoPlayer.STATE_READY -> {
                     Log.d(TAG, "onPlaybackStateChanged: STATE_READY")
                 }
-
             }
         }
 
@@ -315,9 +336,6 @@ class VideoPlayer : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-    }
 }
 
 

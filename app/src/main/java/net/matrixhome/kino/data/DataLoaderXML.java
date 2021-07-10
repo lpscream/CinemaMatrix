@@ -278,6 +278,12 @@ public class DataLoaderXML {
                         filmList.serial_views = jsonObject.getString("serial_views");
                         filmList.video_views = jsonObject.getString("video_views");
                         filmList.url = jsonObject.getString("url");
+                        if (filmList.cover.startsWith("https://")){
+                            filmList.cover.replace("https", "http");
+                        }
+                        if (filmList.cover_200.startsWith("https://")){
+                            filmList.cover_200.replace("https", "http");
+                        }
                         arrayList.add(filmList);
                     }
                 } catch (JSONException e) {
@@ -457,6 +463,12 @@ public class DataLoaderXML {
                     filmList.serial_views = jsonObject.getString("serial_views");
                     filmList.video_views = jsonObject.getString("video_views");
                     filmList.url = jsonObject.getString("url");
+                    if (filmList.cover.startsWith("https://")){
+                        filmList.cover.replace("https", "http");
+                    }
+                    if (filmList.cover_200.startsWith("https://")){
+                        filmList.cover_200.replace("https", "http");
+                    }
                     arrayList.add(filmList);
                 }
             } catch (JSONException e) {
@@ -563,6 +575,12 @@ public class DataLoaderXML {
                     filmList.video_views = jsonObject.getString("video_views");
                     filmList.url = jsonObject.getString("url");
                     filmList.series = new ArrayList<>();
+                    if (filmList.cover.startsWith("https://")){
+                        filmList.cover.replace("https", "http");
+                    }
+                    if (filmList.cover_200.startsWith("https://")){
+                        filmList.cover_200.replace("https", "http");
+                    }
                     for (int i = 0; i < jsonObject.getJSONArray("series").length(); i++) {
                         filmList.series.add(jsonObject.getJSONArray("series").get(i).toString());
                     }
@@ -666,6 +684,12 @@ public class DataLoaderXML {
                     filmList.serial_views = jsonObject.getString("serial_views");
                     filmList.video_views = jsonObject.getString("video_views");
                     filmList.url = jsonObject.getString("url");
+                    if (filmList.cover.startsWith("https://")){
+                        filmList.cover.replace("https", "http");
+                    }
+                    if (filmList.cover_200.startsWith("https://")){
+                        filmList.cover_200.replace("https", "http");
+                    }
                     arrayList.add(filmList);
                 }
             } catch (JSONException e) {
@@ -761,6 +785,12 @@ class ParseJSONString implements Callable<ArrayList<FilmList>> {
                 filmList.serial_views = jsonObject.getString("serial_views");
                 filmList.video_views = jsonObject.getString("video_views");
                 filmList.url = jsonObject.getString("url");
+                if (filmList.cover.startsWith("https://")){
+                    filmList.cover.replace("https", "http");
+                }
+                if (filmList.cover_200.startsWith("https://")){
+                    filmList.cover_200.replace("https", "http");
+                }
                 arrayList.add(filmList);
             }
         } catch (JSONException e) {
@@ -943,6 +973,12 @@ class GEtAllData implements Callable<ArrayList<FilmList>> {
                 filmList.serial_views = k.getString("serial_views");
                 filmList.video_views = k.getString("video_views");
                 filmList.url = k.getString("url");
+                if (filmList.cover.startsWith("https://")){
+                    filmList.cover.replace("https", "http");
+                }
+                if (filmList.cover_200.startsWith("https://")){
+                    filmList.cover_200.replace("https", "http");
+                }
                 arrayList.add(filmList);
 
             }

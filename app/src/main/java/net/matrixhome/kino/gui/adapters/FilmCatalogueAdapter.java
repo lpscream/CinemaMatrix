@@ -1,4 +1,4 @@
-package net.matrixhome.kino.gui;
+package net.matrixhome.kino.gui.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,64 +11,61 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import net.matrixhome.kino.R;
-import net.matrixhome.kino.data.FilmList;
-import net.matrixhome.kino.viewmodel.FilmViewModel;
+import net.matrixhome.kino.gui.RoundedCornersTransformation;
+import net.matrixhome.kino.model.Movies;
+import net.matrixhome.kino.viewmodel.FilmCatalougeModel;
 
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
-    private final String TAG = "DataAdapter_log";
-    private final ArrayList<Integer> hidenList = new ArrayList<>();
+public class FilmCatalogueAdapter extends RecyclerView.Adapter<FilmCatalogueAdapter.ViewHolder> {
+    private final String TAG = "FilmCatalogueAdapter_lo";
     private final Context cntx;
-    public int offset = 0;
-    ArrayList<FilmList> filmLists;
+    ArrayList<Movies> filmLists;
     LayoutInflater inflater;
-    private ItemClickListener mClickListener;
+    private FilmCatalogueAdapter.ItemClickListener mClickListener;
     private View.OnScrollChangeListener onMyScrollListener;
     private int pos;
-    private FilmViewModel filmViewModel;
-    private Integer id;
+    private FilmCatalougeModel filmViewModel;
+    private String id;
 
 
-    DataAdapter(Context context, ArrayList<FilmList> films, FilmViewModel filmViewModel, Integer id) {
-        this.filmLists = films;
+    public FilmCatalogueAdapter(Context context, ArrayList<Movies> films, FilmCatalougeModel filmViewModel, String id) {
+        this.filmLists = films;//список фильмов
         this.inflater = LayoutInflater.from(context);
         this.cntx = context;
-        this.filmViewModel = filmViewModel;
-        this.id = id;
+        this.filmViewModel = filmViewModel;//вьюмодель
+        this.id = id;//id ряда фильмов
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateViewHolder: viewType " + viewType);
+    public FilmCatalogueAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.listview, parent, false);
-        return new ViewHolder(v);
+        return new FilmCatalogueAdapter.ViewHolder(v);
     }
 
     @SuppressLint("ResourceAsColor")
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if (position == getItemCount() - 5) {
+    public void onBindViewHolder(@NonNull FilmCatalogueAdapter.ViewHolder holder, int position) {
+        if (position == getItemCount() - 15) {
             filmViewModel.updateListByID(id);
             Log.d(TAG, "onBindViewHolder: " + "id " + id + " current update position " + position);
         }
-        if (filmLists.get(position).serial_name != "null") {
-            holder.filmName.setText(filmLists.get(position).serial_name);
+        if (filmLists.get(position).getSerial_name() != null) {
+            holder.filmName.setText(filmLists.get(position).getSerial_name());
         } else {
-            holder.filmName.setText(filmLists.get(position).name);
+            holder.filmName.setText(filmLists.get(position).getName());
         }
-        holder.ageTV.setText(filmLists.get(position).age);
+        holder.ageTV.setText(filmLists.get(position).getAge());
         holder.ageTV.setBackgroundColor(R.color.colorGrey);
-        holder.ratingTV.setText(filmLists.get(position).rating);
+        holder.ratingTV.setText(filmLists.get(position).getRating());
         holder.ratingTV.setBackgroundColor(R.color.colorGrey);
-        holder.yearCountry.setText(filmLists.get(position).year + ", " + filmLists.get(position).country);
-        Picasso.get().load(filmLists.get(position).cover_200).transform(new RoundedCornersTransformation(30, 0)).resize(350, 500).centerCrop().into(holder.filmCover);
+        holder.yearCountry.setText(filmLists.get(position).getYear() + ", " + filmLists.get(position).getCountry());
+        Picasso.get().load(filmLists.get(position).getCover_200()).transform(new RoundedCornersTransformation(30, 0)).resize(350, 500).centerCrop().into(holder.filmCover);
         holder.itemView.setFocusable(true);
         holder.itemView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -86,43 +83,15 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                 }
             }
         });
-
-/*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            holder.itemView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-                @Override
-                public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                }
-            });
-        }
-
- */
         pos = position;
     }
 
 
-    public void setItems(int num) {
-        for (int i = num; i < getItemCount(); i++) {
-            Log.d(TAG, "setItems: " + i);
-            notifyItemInserted(i);
-            //notifyItemRangeInserted();
-        }
-
-        //notifyDataSetChanged();
-    }
-
-    public void deleteItem() {
-        for (int i = 0; i < hidenList.size(); i++) {
-            notifyItemRemoved(hidenList.get(i));
-            notifyItemRangeChanged(hidenList.get(i), hidenList.get(hidenList.size() - 1));
-        }
-    }
-
     @Override
     public int getItemCount() {
         if (filmLists != null)
-        return filmLists.size();
-            else return 0;
+            return filmLists.size();
+        else return 0;
     }
 
 
@@ -131,22 +100,16 @@ class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     }
 
     //click listener
-    void setClickListener(ItemClickListener itemClickListener) {
+    public void setClickListener(FilmCatalogueAdapter.ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
 
-    //onMyScrollListener listener
     void setOnScrollChangeListener(View.OnScrollChangeListener onScrollChangeListener) {
         this.onMyScrollListener = onScrollChangeListener;
     }
 
-    public interface ItemClickListener {
+    public interface ItemClickListener{
         void onItemClick(View view, int position);
-    }
-
-
-    public interface OnScrollChangeListener {
-        void onScrollChange(View view, int i, int i1, int i2, int i3);
     }
 
     @SuppressLint("NewApi")

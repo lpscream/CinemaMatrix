@@ -1,8 +1,8 @@
 package net.matrixhome.kino.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,8 +10,15 @@ import net.matrixhome.kino.data.Constants
 import net.matrixhome.kino.data.FilmList
 import net.matrixhome.kino.data.Genre
 import net.matrixhome.kino.data.ViewModelDataDownloader
+import net.matrixhome.kino.model.FilmRepository
+import net.matrixhome.kino.model.Movies
+import net.matrixhome.kino.retrofit.Common
+import net.matrixhome.kino.retrofit.RetrofitService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class FilmViewModel(application: Application) : AndroidViewModel(application) {
+class FilmViewModel() : ViewModel() {
     //film database
     var lastAddedFilmList = MutableLiveData<ArrayList<FilmList>>()
     var byPopularityFilmFilmLists = MutableLiveData<ArrayList<FilmList>>()
@@ -20,6 +27,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
     var byNameFilmLists = MutableLiveData<ArrayList<FilmList>>()
     var byDatePremiereFilmLists = MutableLiveData<ArrayList<FilmList>>()
     var estimatedFilmLists = MutableLiveData<ArrayList<FilmList>>()
+    var test = MutableLiveData<ArrayList<Movies>>()
 
     var genreID = MutableLiveData<String>()
     var countryID = MutableLiveData<String>()
@@ -36,8 +44,6 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
     var sort_variant_date_premiere = MutableLiveData<String>()
     var sort_variant_rating_vote = MutableLiveData<String>()
 
-
-
     private var update_lastAddedFilmList = ArrayList<FilmList>()
     private var update_byPopularityFilmFilmLists = ArrayList<FilmList>()
     private var update_byViewsFilmLists = ArrayList<FilmList>()
@@ -45,9 +51,6 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
     private var update_byNameFilmLists = ArrayList<FilmList>()
     private var update_byDatePremiereFilmLists = ArrayList<FilmList>()
     private var update_estimatedFilmLists = ArrayList<FilmList>()
-
-    var updatelastAddedFilmList = ArrayList<FilmList>()
-    var newFilmList = MutableLiveData<ArrayList<FilmList>>()
 
     var updateListState1 = true
     var updateListState2 = true
@@ -73,12 +76,11 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
     private var byDatePremiereOffset: Int = 0
     private var estimatedOffset: Int = 0
 
+    var  retrofit: RetrofitService? = null
 
     val ACTION_VIDEO = "?action=video"
 
-
     var LIMIT = "&limit="
-
 
     var genreArrayList = MutableLiveData<ArrayList<Genre>>()
     var genreLink = "?action=genre"
@@ -91,21 +93,18 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
     val BYDATEPREMIER_ID: Int = 5
     val ESTIMATED_ID: Int = 6
 
-
     var lastAppVersion = MutableLiveData<Int>()
 
     //array to add new film list to database
-    val TAG: String = "FilmViewModel"
+    val TAG: String = "FilmViewModel_log"
     val viewModelDataDownloader: ViewModelDataDownloader = ViewModelDataDownloader()
     val coroutineThread = CoroutineScope(Dispatchers.IO)
-
 
     override fun onCleared() {
         super.onCleared()
     }
 
     init {
-
         sort_variant_added.value = "&sort_desc=added"
         sort_variant_views_month.value = "&sort_desc=views_month"
         sort_variant_views.value = "&sort_desc=views"
@@ -118,12 +117,6 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         category.value = ""
         countryID.value = ""
         yearFromTo.value = ""
-
-        coroutineThread.launch {
-            genreArrayList.postValue(viewModelDataDownloader.getAllGenres(genreLink))
-        }
-
-        getAllDataOnStart()
     }
 
     fun getNewSortedFilList(){
@@ -212,7 +205,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
                     + Constants.COUNT))
             byPopularityFilmFilmLists.postValue(update_byPopularityFilmFilmLists)
         }
-        coroutineThread.launch {
+        /*coroutineThread.launch {
             update_byViewsFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
                     + sort_variant_views.value
@@ -223,7 +216,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
                     + LIMIT
                     + Constants.COUNT))
             byViewsFilmLists.postValue(update_byViewsFilmLists)
-        }
+        }*/
         coroutineThread.launch {
             update_byRatingFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
@@ -236,7 +229,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
                     + Constants.COUNT))
             byRatingFilmLists.postValue(update_byRatingFilmLists)
         }
-        coroutineThread.launch {
+        /*coroutineThread.launch {
             update_byNameFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
                     + sort_variant_name.value
@@ -247,7 +240,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
                     + LIMIT
                     + Constants.COUNT))
             byNameFilmLists.postValue(update_byNameFilmLists)
-        }
+        }*/
         coroutineThread.launch {
             update_byDatePremiereFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
@@ -260,7 +253,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
                     + Constants.COUNT))
             byDatePremiereFilmLists.postValue(update_byDatePremiereFilmLists)
         }
-        coroutineThread.launch {
+        /*coroutineThread.launch {
             update_estimatedFilmLists.addAll(viewModelDataDownloader.getAllData(
                     ACTION_VIDEO
                     + sort_variant_rating_vote.value
@@ -271,7 +264,7 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
                     + LIMIT
                     + Constants.COUNT))
             estimatedFilmLists.postValue(update_estimatedFilmLists)
-        }
+        }*/
     }
 
     private fun clearAllData(){
@@ -311,8 +304,6 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
         updateListState6 = true
         updateListState7 = true
     }
-
-
 
     fun updateListByID(id: Int){
             when(id){
@@ -388,6 +379,10 @@ class FilmViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
     }
+
+
+
+
 }
 
 

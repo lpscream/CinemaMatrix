@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
@@ -16,12 +17,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.shape.CornerFamily;
+import com.google.android.material.shape.MaterialShapeDrawable;
+import com.google.android.material.shape.ShapeAppearanceModel;
 import com.squareup.picasso.Picasso;
 
 import net.matrixhome.kino.R;
@@ -29,9 +32,14 @@ import net.matrixhome.kino.data.DataLoaderXML;
 import net.matrixhome.kino.data.FilmList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 public class DescriptionActivity extends AppCompatActivity {
@@ -41,24 +49,19 @@ public class DescriptionActivity extends AppCompatActivity {
     private String name, description, id, cover, videoLink, year, serial_name;
     private TextView nameTV, yearTV, descriptionTV, countryTV, directorTV, actorsTV, genresTV, ageTV, ratingTV, translateTV, translateDscrTV, qualityTV, qualityTVDscrp, serialSign, seasonSign;
     private ImageView coverView;
-    private Button playVideoBtn, downloadBtn;
+    private Button playVideoBtn, downloadBtn, exo_next, exo_prev;
     private ArrayList<FilmList> filmLists;
     private FilmList filmList;
     private int currentSeasonNumber;
-
+    private Context context = this;
     private String currentSeasonID, currentEpisodeNumber, seriesCount;
-
-
     private Animator mCurrentAnimator;
     private int shortAnimationDuration;
     private ImageView expandedImageView;
-
-
-    private ImageButton btnPreviousSeason, btnNextSeason, btnPreviousEpisode, btnNextEpisode;
-    private TextView episodeNumber, seasonNumber;
-
-    ////serial describer
-
+    private RecyclerView seasonRecyclerView, episodeRecyclerView;
+    private DescriptionAdapter seasonAdapter, episodeAdapter;
+    private ArrayList<String> seasonArrayList, episodesArrayList;
+    private ArrayList<Integer> arrayToSort;
     private LinearLayout serialDescriber;
     private ArrayList<FilmList> serialList;
     private DataLoaderXML dataLoaderXML;
@@ -67,8 +70,7 @@ public class DescriptionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_description);
-        //DataLoaderXML loader = new DataLoaderXML(3);
+        setContentView(R.layout.descrip_film_fragment);
         filmLists = new ArrayList<>();
         serialList = new ArrayList<>();
         currentSeasonID = "";
@@ -78,37 +80,28 @@ public class DescriptionActivity extends AppCompatActivity {
         serialDescriber = findViewById(R.id.seasonSelectLayout);
         dataLoaderXML = new DataLoaderXML(3);
 
-        seasonSign = findViewById(R.id.seasonSign);
-        serialSign = findViewById(R.id.serialSign);
 
         shortAnimationDuration = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
         expandedImageView = findViewById(
                 R.id.expanded_image);
 
-        nameTV = findViewById(R.id.filmNameDesActivity);
-        yearTV = findViewById(R.id.filmYearDesActivity);
+        nameTV = findViewById(R.id.filmNameDescFragment);
+        yearTV = findViewById(R.id.filmYearDescFragment);
         descriptionTV = findViewById(R.id.descriptionTV);
-        coverView = findViewById(R.id.imageView);
-        countryTV = findViewById(R.id.filmCountryDesActivity);
-        directorTV = findViewById(R.id.filmDirectorDesActivity);
+        coverView = findViewById(R.id.imageViewDescFragmnet);
+        countryTV = findViewById(R.id.filmCountryDescFragment);
+        directorTV = findViewById(R.id.filmDirectorDescFragment);
         actorsTV = findViewById(R.id.filmActorsDesActivity);
-        genresTV = findViewById(R.id.filmGenreDesActivity);
+        genresTV = findViewById(R.id.filmGenreDescFragment);
         playVideoBtn = findViewById(R.id.playVideoBtn);
+
         ageTV = findViewById(R.id.ageDiscTV);
         ratingTV = findViewById(R.id.ratingDiscTV);
         translateTV = findViewById(R.id.translateTV);
         translateDscrTV = findViewById(R.id.translateDscrTV);
         qualityTV = findViewById(R.id.isHD);
         qualityTVDscrp = findViewById(R.id.isHDDiscrp);
-
-        seasonNumber = findViewById(R.id.seasonNumber);
-        episodeNumber = findViewById(R.id.episodeNumber);
-
-        btnNextEpisode = findViewById(R.id.btnNextEpisode);
-        btnNextSeason = findViewById(R.id.btnNextSeason);
-        btnPreviousEpisode = findViewById(R.id.btnPreviousEpisode);
-        btnPreviousSeason = findViewById(R.id.btnPreviousSeason);
 
         /*downloadBtn = findViewById(R.id.downloadBtn);
         downloadBtn.setOnClickListener(new View.OnClickListener() {
@@ -119,12 +112,14 @@ public class DescriptionActivity extends AppCompatActivity {
         });*/
 
         Intent intent = getIntent();
-
         Bundle bundle = intent.getExtras();
         filmList = (FilmList) bundle.getSerializable("array");
-        Log.d(TAG, "onCreate: from bundle " + filmList.age);
+        Log.d(TAG, "onCreate: from bundle " + filmList.id);
+        Log.d(TAG, "onCreate: from bundle " + filmList.serial_id);
+
         if (filmList.serial_id.equalsIgnoreCase("null")) {
             //fill film description
+
             serialDescriber.setVisibility(View.GONE);
             id = intent.getStringExtra("id");
             serial_name = intent.getStringExtra("serial_name");
@@ -139,7 +134,7 @@ public class DescriptionActivity extends AppCompatActivity {
             directorTV.setText(intent.getStringExtra("director"));
             genresTV.setText(intent.getStringExtra("genres"));
             actorsTV.setText(intent.getStringExtra("actors"));
-            Picasso.get().load(cover).transform(new RoundedCornersTransformation(30, 0)).resize(700, 1000).into(coverView);
+            Picasso.get().load(cover).transform(new RoundedCornersTransformation(30, 0)).fit().into(coverView);
             Picasso.get().load(cover).transform(
                     new RoundedCornersTransformation(30, 0))
                     .into(expandedImageView);
@@ -164,25 +159,32 @@ public class DescriptionActivity extends AppCompatActivity {
         } else {
             //заполняем атрибуты сериала  при старте активити
 
+
+
             //current season ID
             currentSeasonID = "1";
             //current episode number
             currentEpisodeNumber = "1";
             //current number of season
             currentSeasonNumber = 1;
-
+            playVideoBtn.setVisibility(View.GONE);
             String str = dataLoaderXML.getList("?action=video&serial_id=" + filmList.serial_id);
             serialList = dataLoaderXML.parseSerialJSON(str);
 
+            String minEpisodeNum = serialList.get(0).season_number;
+            for (int i = 0; i < serialList.size(); i++) {
+                if (Integer.parseInt(serialList.get(i).season_number) < Integer.parseInt(minEpisodeNum)) {
+                    minEpisodeNum = serialList.get(i).season_number;
+                }
+            }
             //start serial description
             for (int i = 0; i < serialList.size(); i++) {
-                if (serialList.get(i).season_number.equalsIgnoreCase(String.valueOf(1))) {
+                //TODO need fix serials with number > 1      fixed!!!
+                if (serialList.get(i).season_number.equalsIgnoreCase(minEpisodeNum)) {
                     //new serial atributes
+                    id = serialList.get(i).id;
                     seriesCount = String.valueOf(serialList.get(i).series.size());
-                    Log.d(TAG, "onNumberPicked: series: " + serialList.get(i).series.size());
-                    Log.d(TAG, "onNumberPicked: " + serialList.get(i).cover);
-                    Log.d(TAG, "onNumberPicked: " + serialList.get(i).name);
-                    Picasso.get().load(serialList.get(i).cover_200).transform(new RoundedCornersTransformation(30, 0)).resize(700, 1000).into(coverView);
+                    Picasso.get().load(serialList.get(i).cover_200).transform(new RoundedCornersTransformation(30, 0)).fit().into(coverView);
                     Picasso.get().load(serialList.get(i).cover).into(expandedImageView);
                     nameTV.setText(serialList.get(i).name + " (" + serialList.get(i).serial_o_name + ")");
                     descriptionTV.setText(serialList.get(i).description);
@@ -199,7 +201,6 @@ public class DescriptionActivity extends AppCompatActivity {
                         translateTV.setText(filmList.translate);
                     else {
                         translateDscrTV.setVisibility(View.GONE);
-                        translateDscrTV.setVisibility(View.GONE);
                         translateTV.setPadding(0, 0, 0, 0);
                     }
                     if (filmList.hd == 1)
@@ -208,115 +209,96 @@ public class DescriptionActivity extends AppCompatActivity {
                         qualityTV.setVisibility(View.GONE);
                         qualityTVDscrp.setVisibility(View.GONE);
                     }
+                    //init recyclerview with seasons
+                    seasonRecyclerView = findViewById(R.id.seasonChooserRV);
+                    seasonRecyclerView.setHasFixedSize(false);
+                    seasonRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+                    seasonArrayList = new ArrayList<>();
+                    arrayToSort =  new ArrayList<>();
+
+                    for (int j = 0; j < serialList.size(); j++) {
+                        arrayToSort.add(Integer.parseInt(serialList.get(j).season_number));
+                    }
+
+                    Collections.sort(arrayToSort);
+                    for (int j = 0; j < arrayToSort.size(); j++) {
+                        seasonArrayList.add(arrayToSort.get(j).toString());
+                    }
+
+                    seasonAdapter = new DescriptionAdapter(this, seasonArrayList);
+                    seasonRecyclerView.setAdapter(seasonAdapter);
+                    episodeRecyclerView = findViewById(R.id.episodeChooserRV);
+                    episodeRecyclerView.setHasFixedSize(false);
+                    episodeRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+                    episodesArrayList = new ArrayList<>();
+                    episodesArrayList.addAll(serialList.get(i).series);
+                    episodeAdapter = new DescriptionAdapter(this, episodesArrayList);
+                    episodeRecyclerView.setAdapter(episodeAdapter);
+                    seasonRecyclerView.requestFocus();
+                    seasonAdapter.setOnmClickListener(new DescriptionAdapter.ItemClickListener() {
+                        @Override
+                        public void onItenClick(View view, int position) {
+                            Log.d(TAG, "onItenClick: " + position);
+                            for (int i = 0; i < serialList.size(); i++) {
+                                if (serialList.get(i).season_number.equalsIgnoreCase(String.valueOf(position + 1))) {
+                                    Picasso.get().load(serialList.get(i).cover_200).transform(
+                                            new RoundedCornersTransformation(30, 0))
+                                            .resize(700, 1000).into(coverView);
+                                    Picasso.get().load(serialList.get(i).cover).into(expandedImageView);
+                                    nameTV.setText(serialList.get(i).name + " (" + serialList.get(i).serial_o_name + ")");
+                                    descriptionTV.setText(serialList.get(i).description);
+                                    yearTV.setText(serialList.get(i).year);
+                                    countryTV.setText(serialList.get(i).country);
+                                    directorTV.setText(serialList.get(i).director);
+                                    genresTV.setText(serialList.get(i).genres);
+                                    actorsTV.setText(serialList.get(i).actors);
+                                    ageTV.setText(serialList.get(i).age);
+                                    ratingTV.setText(serialList.get(i).rating);
+                                    currentSeasonID = serialList.get(i).id;
+                                    Log.d(TAG, "onItenClick: id " + currentSeasonID);
+                                    //TODO need to check
+                                    seriesCount = String.valueOf(serialList.get(i).series.size());
+                                    name = serialList.get(i).name;
+                                    episodeAdapter.setNewList(serialList.get(i).series);
+                                    episodeRecyclerView.scrollToPosition(0);
+                                }
+                            }
+                        }
+                    });
+
+                    episodeAdapter.setOnmClickListener(new DescriptionAdapter.ItemClickListener() {
+                        @Override
+                        public void onItenClick(View view, int position) {
+                            currentEpisodeNumber = String.valueOf(position + 1);
+                            Intent intent = new Intent(getApplicationContext(), VideoPlayer.class);
+                            intent.putExtra("link", dataLoaderXML.getSerialLinkByID(currentSeasonID, currentEpisodeNumber));
+                            intent.putExtra("currentSeasonNumber", currentSeasonID);
+                            intent.putExtra("currentEpisodeNumber", currentEpisodeNumber);
+                            intent.putExtra("seriesCount", seriesCount);
+                            intent.putExtra("isSerial", true);
+                            intent.putExtra("name", nameTV.getText().toString());
+                            startActivity(intent);
+                        }
+                    });
                 }
             }
         }
-
-        coverView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                zoomImageFromThumb(coverView);
-            }
-        });
-
-
-        expandedImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                expandedImageView.setVisibility(View.GONE);
-            }
-        });
-
-        btnPreviousSeason.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "onClick: currentSeasonNumber " + currentSeasonNumber);
-                if (currentSeasonNumber - 1 > 0) {
-                    currentSeasonNumber = currentSeasonNumber - 1;
-                    for (int i = 0; i < serialList.size(); i++) {
-                        if (serialList.get(i).season_number.equalsIgnoreCase(String.valueOf(currentSeasonNumber))) {
-                            Picasso.get().load(serialList.get(i).cover_200).transform(
-                                    new RoundedCornersTransformation(30, 0))
-                                    .resize(700, 1000).into(coverView);
-                            Picasso.get().load(serialList.get(i).cover).into(expandedImageView);
-                            nameTV.setText(serialList.get(i).name + " (" + serialList.get(i).serial_o_name + ")");
-                            descriptionTV.setText(serialList.get(i).description);
-                            yearTV.setText(serialList.get(i).year);
-                            countryTV.setText(serialList.get(i).country);
-                            directorTV.setText(serialList.get(i).director);
-                            genresTV.setText(serialList.get(i).genres);
-                            actorsTV.setText(serialList.get(i).actors);
-                            ageTV.setText(serialList.get(i).age);
-                            ratingTV.setText(serialList.get(i).rating);
-                            seasonNumber.setText(String.valueOf(currentSeasonNumber));
-                            currentSeasonID = serialList.get(i).id;
-                            seriesCount = String.valueOf(serialList.get(i).series.size());
-                            name = serialList.get(i).name;
-                            episodeNumber.setText("1");
-                            currentEpisodeNumber = "1";
-                        }
-                    }
+        if (getScreenOrientation()) {
+            coverView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    zoomImageFromThumb(coverView);
                 }
-            }
-        });
+            });
 
-        btnNextSeason.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (currentSeasonNumber + 1 <= serialList.size()) {
-                    currentSeasonNumber = currentSeasonNumber + 1;
-                    Log.d(TAG, "onClick: " + currentSeasonNumber + 1);
-                    for (int i = 0; i < serialList.size(); i++) {
-                        Log.d(TAG, "onClick: 3");
-                        if (serialList.get(i).season_number.equalsIgnoreCase(String.valueOf(currentSeasonNumber))) {
-                            Log.d(TAG, "onClick: 4");
-                            Picasso.get().load(serialList.get(i).cover_200).transform(
-                                    new RoundedCornersTransformation(30, 0))
-                                    .resize(700, 1000).into(coverView);
-                            Picasso.get().load(serialList.get(i).cover).into(expandedImageView);
-                            nameTV.setText(serialList.get(i).name + " (" + serialList.get(i).serial_o_name + ")");
-                            descriptionTV.setText(serialList.get(i).description);
-                            yearTV.setText(serialList.get(i).year);
-                            countryTV.setText(serialList.get(i).country);
-                            directorTV.setText(serialList.get(i).director);
-                            genresTV.setText(serialList.get(i).genres);
-                            actorsTV.setText(serialList.get(i).actors);
-                            ageTV.setText(serialList.get(i).age);
-                            ratingTV.setText(serialList.get(i).rating);
-                            seasonNumber.setText(String.valueOf(currentSeasonNumber));
-                            seriesCount = String.valueOf(serialList.get(i).series.size());
-                            episodeNumber.setText("1");
-                            name = serialList.get(i).name;
-                            currentEpisodeNumber = "1";
-                            currentSeasonID = serialList.get(i).id;
-                        }
-                    }
+
+            expandedImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    expandedImageView.setVisibility(View.GONE);
                 }
-            }
-        });
-
-        btnNextEpisode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Integer.parseInt(currentEpisodeNumber) + 1 <= Integer.parseInt(seriesCount)) {
-                    currentEpisodeNumber = String.valueOf(Integer.parseInt(currentEpisodeNumber) + 1);
-                    episodeNumber.setText(currentEpisodeNumber);
-                }
-            }
-        });
-
-        btnPreviousEpisode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Integer.parseInt(currentEpisodeNumber) - 1 > 0) {
-                    currentEpisodeNumber = String.valueOf(Integer.parseInt(currentEpisodeNumber) - 1);
-                    episodeNumber.setText(currentEpisodeNumber);
-                }
-            }
-        });
-
-
-        //intent.getStringArrayExtra("array");
+            });
+        }
 
         //TODO what a fuck!!!!
         if (intent.getBooleanExtra("isSerial", false)) {
@@ -324,7 +306,6 @@ public class DescriptionActivity extends AppCompatActivity {
         } else {
 
         }
-
 
         videoLink = dataLoaderXML.getLinkByID(id);
         playVideoBtn.setOnClickListener(new View.OnClickListener() {
@@ -348,11 +329,12 @@ public class DescriptionActivity extends AppCompatActivity {
                 }
             }
         });
+        createRoundedCorners(playVideoBtn);
         playVideoBtn.requestFocus();
 
 
+
         //filmDownload();
-        Log.d(TAG, "onCreate: ");
     }
 
     private void setSerialAttributes(int episodeNum) {
@@ -507,7 +489,6 @@ public class DescriptionActivity extends AppCompatActivity {
                 if (mCurrentAnimator != null) {
                     mCurrentAnimator.cancel();
                 }
-
                 AnimatorSet set = new AnimatorSet();
                 set.play(ObjectAnimator
                         .ofFloat(expandedImageView, View.X, startBounds.left))
@@ -529,7 +510,6 @@ public class DescriptionActivity extends AppCompatActivity {
                         expandedImageView.setVisibility(View.GONE);
                         mCurrentAnimator = null;
                     }
-
                     @Override
                     public void onAnimationCancel(Animator animation) {
                         thumbView.setAlpha(1f);
@@ -543,4 +523,15 @@ public class DescriptionActivity extends AppCompatActivity {
         });
     }
 
+    private void createRoundedCorners(View view){
+        ShapeAppearanceModel shapeAppearanceModel = new ShapeAppearanceModel()
+                .toBuilder()
+                .setAllCorners(CornerFamily.ROUNDED, android.R.attr.radius)
+                .build();
+        MaterialShapeDrawable shapeDrawable = new MaterialShapeDrawable(shapeAppearanceModel);
+        shapeDrawable.setFillColor(ContextCompat.getColorStateList(this,R.color.btn_background));
+        shapeDrawable.setStroke(2.0f, ContextCompat.getColor(this, R.color.btn_background));
+        shapeDrawable.setElevation(10f);
+        ViewCompat.setBackground(view, shapeDrawable);
+    }
 }

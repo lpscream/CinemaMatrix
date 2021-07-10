@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+    android:id="@+id/containerDesc"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:textAlignment="center"
@@ -11,17 +11,19 @@
 
     <LinearLayout
         android:id="@+id/btnLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
         android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seasonSelectLayout">
 
         <Button
             android:id="@+id/playVideoBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/letsplay" />
 
@@ -35,95 +37,54 @@
 
     <LinearLayout
         android:id="@+id/seasonSelectLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
         android:weightSum="8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/firstLayout">
 
         <TextView
-            android:id="@+id/seasonSign"
-            android:layout_width="wrap_content"
+            android:id="@+id/seasonSignTV"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:paddingEnd="8dp"
-            android:text="@string/season"
-            android:textSize="18sp" />
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/choose_season" />
 
-        <ImageButton
-            android:id="@+id/btnPreviousSeason"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/serial_btn_selector"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/btn_left_arrow" />
+
+        <net.matrixhome.kino.gui.CustomRecyclerView
+            android:id="@+id/seasonChooserRV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:nestedScrollingEnabled="true"
+            android:orientation="horizontal"
+            tools:itemCount="1" />
 
         <TextView
-            android:id="@+id/seasonNumber"
-            android:layout_width="wrap_content"
+            android:id="@+id/episodeSignTV"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:text="1"
-            android:textAlignment="center" />
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/episode" />
 
-        <ImageButton
-            android:id="@+id/btnNextSeason"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/serial_btn_selector"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/btn_right_arrow" />
-
-        <TextView
-            android:id="@+id/serialSign"
-            android:layout_width="wrap_content"
+        <net.matrixhome.kino.gui.CustomRecyclerView
+            android:id="@+id/episodeChooserRV"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:text="@string/episode"
-            android:textSize="18sp" />
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            tools:itemCount="1">
 
-        <ImageButton
-            android:id="@+id/btnPreviousEpisode"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/serial_btn_selector"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/btn_left_arrow" />
-
-        <TextView
-            android:id="@+id/episodeNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:text="1"
-            android:textAlignment="center" />
-
-        <ImageButton
-            android:id="@+id/btnNextEpisode"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/serial_btn_selector"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/btn_right_arrow" />
-
-
+        </net.matrixhome.kino.gui.CustomRecyclerView>
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -142,7 +103,8 @@
             android:text="@string/youtube_trailer_button"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="218dp" />
+            tools:layout_editor_absoluteY="218dp"
+            tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/nameImageLayout"
@@ -158,13 +120,12 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="170dp"
+                android:id="@+id/imageViewDescFragmnet"
+                android:layout_width="155dp"
                 android:layout_height="220dp"
                 android:foregroundGravity="top"
                 android:minHeight="150dp"
                 android:scaleType="fitXY"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/default_icon" />
@@ -177,8 +138,8 @@
                 android:background="@color/exo_error_message_background_color"
                 android:textColor="@color/colorGrey"
                 android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/imageView" />
+                app:layout_constraintBottom_toBottomOf="@id/imageViewDescFragmnet"
+                app:layout_constraintEnd_toEndOf="@+id/imageViewDescFragmnet" />
 
             <TextView
                 android:id="@+id/ageDiscTV"
@@ -188,8 +149,8 @@
                 android:background="@color/exo_error_message_background_color"
                 android:textColor="@color/colorGrey"
                 android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@id/imageView" />
+                app:layout_constraintBottom_toBottomOf="@id/imageViewDescFragmnet"
+                app:layout_constraintStart_toStartOf="@id/imageViewDescFragmnet" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/discrConstraint"
@@ -198,13 +159,14 @@
                 android:layout_marginStart="8dp"
                 android:minHeight="150dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintStart_toEndOf="@+id/imageViewDescFragmnet"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/filmNameDesActivity"
+                    android:id="@+id/filmNameDescFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/colorWhite"
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -220,14 +182,15 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
                 <TextView
-                    android:id="@+id/filmGenreDesActivity"
+                    android:id="@+id/filmGenreDescFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:maxLines="2"
                     android:singleLine="true"
+                    android:textColor="@color/white_focused_season_btn"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView5"
-                    app:layout_constraintTop_toBottomOf="@+id/filmCountryDesActivity" />
+                    app:layout_constraintTop_toBottomOf="@+id/filmCountryDescFragment" />
 
                 <TextView
                     android:id="@+id/textView3"
@@ -237,27 +200,28 @@
                     android:singleLine="true"
                     android:text="@string/year"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/filmNameDesActivity" />
+                    app:layout_constraintTop_toBottomOf="@+id/filmNameDescFragment" />
 
                 <TextView
-                    android:id="@+id/filmYearDesActivity"
+                    android:id="@+id/filmYearDescFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="start|center_horizontal"
+                    android:textColor="@color/white_focused_season_btn"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView3"
-                    app:layout_constraintTop_toBottomOf="@+id/filmNameDesActivity" />
+                    app:layout_constraintTop_toBottomOf="@+id/filmNameDescFragment" />
 
                 <TextView
                     android:id="@+id/filmActorsDesActivity"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:maxLines="3"
-                    android:singleLine="false"
+                    android:maxLines="5"
+                    android:textColor="@color/white_focused_season_btn"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView7"
-                    app:layout_constraintTop_toBottomOf="@+id/filmDirectorDesActivity" />
+                    app:layout_constraintTop_toBottomOf="@+id/filmDirectorDescFragment" />
 
                 <TextView
                     android:id="@+id/textView7"
@@ -287,24 +251,26 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
                 <TextView
-                    android:id="@+id/filmDirectorDesActivity"
+                    android:id="@+id/filmDirectorDescFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:maxLines="2"
                     android:singleLine="false"
+                    android:textColor="@color/white_focused_season_btn"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView6"
-                    app:layout_constraintTop_toBottomOf="@+id/filmGenreDesActivity" />
+                    app:layout_constraintTop_toBottomOf="@+id/filmGenreDescFragment" />
 
                 <TextView
-                    android:id="@+id/filmCountryDesActivity"
+                    android:id="@+id/filmCountryDescFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:maxLines="2"
                     android:singleLine="false"
+                    android:textColor="@color/white_focused_season_btn"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView4"
-                    app:layout_constraintTop_toBottomOf="@+id/filmYearDesActivity" />
+                    app:layout_constraintTop_toBottomOf="@+id/filmYearDescFragment" />
 
                 <TextView
                     android:id="@+id/translateDscrTV"
@@ -321,6 +287,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="2"
                     android:singleLine="false"
+                    android:textColor="@color/white_focused_season_btn"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/translateDscrTV"
                     app:layout_constraintTop_toBottomOf="@+id/filmActorsDesActivity" />
@@ -343,7 +310,8 @@
                     <TextView
                         android:id="@+id/isHD"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white_focused_season_btn" />
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
