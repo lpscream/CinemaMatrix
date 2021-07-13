@@ -46,11 +46,7 @@ class SearchViewModel() : ViewModel() {
                     call: Call<FilmRepository>,
                     response: Response<FilmRepository>
                 ) {
-                    Log.d(TAG, "onResponse: " + call.request())
-                    Log.d(TAG, "onResponse: " + call.toString())
-                    Log.d(TAG, "onResponse: " + response.body().toString())
-                    Log.d(TAG, "onResponse: " + response.body()?.results?.size)
-                    searchFilmList.postValue(response.body()?.results)
+                    searchFilmList.postValue(sortMovieArray(response.body()?.results!!))
                 }
 
                 override fun onFailure(call: Call<FilmRepository>, t: Throwable) {
@@ -61,5 +57,36 @@ class SearchViewModel() : ViewModel() {
             })
         }
 
+    }
+
+
+    private fun sortMovieArray(array: ArrayList<Movies>): ArrayList<Movies> {
+        var str: String = ""
+        var str2: String = ""
+        var arrayLIst = array as List<Movies>
+        for (i in array.indices) {
+            if (i < array.size){
+                if (array[i].serial_id != null){
+                    var j: Int = 1
+                    while (j <= array.size){
+                        if (i < array.size && j < array.size){
+                            if (array[j].serial_id != null){
+                                if (array[i].serial_id == array[j].serial_id){
+                                    if (j != i){
+                                        array.removeAt(i)
+                                        if (j != 0){
+                                            j = j - 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        j++
+                    }
+                }
+
+            }
+        }
+        return array
     }
 }

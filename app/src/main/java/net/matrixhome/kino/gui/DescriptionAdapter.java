@@ -1,6 +1,7 @@
 package net.matrixhome.kino.gui;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,24 @@ public class DescriptionAdapter extends RecyclerView.Adapter<DescriptionAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.number.setText(stringArrayList.get(position));
         pos = position;
+       /* holder.itemView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    v.animate().scaleX(1.1f).scaleY(1.1f).setDuration(200).start();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        v.setElevation(20);
+                    }
+                } else {
+                    v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        v.setElevation(0);
+                    }
+                }
+            }
+        });
+
+        */
     }
 
     @Override

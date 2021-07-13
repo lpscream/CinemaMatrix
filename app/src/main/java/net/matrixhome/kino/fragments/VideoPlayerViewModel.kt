@@ -3,6 +3,7 @@ package net.matrixhome.kino.fragments
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.exoplayer2.C
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,15 +17,18 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class VideoPlayerViewModel : ViewModel() {
+class VideoPlayerViewModel() : ViewModel() {
     private var filmRepository: MutableLiveData<Movies> = MutableLiveData<Movies>()
     private var linksRepo: MutableLiveData<ArrayList<String>> = MutableLiveData<ArrayList<String>>()
     private var links : ArrayList<String> = arrayListOf()
     private var retrofit: RetrofitService? = null
     private val coroutineThread = CoroutineScope(Dispatchers.IO)
     private val TAG = "VideoPlrViewModel_log"
+    var state: Boolean = true
+    var playbackPosition: Long = C.TIME_UNSET
 
     init {
+        Log.d(TAG, "init view model ")
         createRetrofit()
     }
 
@@ -42,38 +46,56 @@ class VideoPlayerViewModel : ViewModel() {
                     TODO("Not yet implemented")
                 }
             })
+            state = false
         }
     }
 
-    fun initLinks(){
+    fun initVideoLinks(){
         var num: Int = filmRepository.value!!.series.size - 1
-        Log.d(TAG, "initLinks: num is " + num)
         Log.d(TAG, "initLinks: series.size " + filmRepository.value!!.series.size)
         coroutineThread.launch {
-            for (i in filmRepository.value!!.series.indices){
-                retrofit?.getVideoLink(filmRepository.value!!.id, filmRepository.value!!.series.get(i))?.
+            if (filmRepository.value!!.series.size > 0){
+                for (i in filmRepository.value!!.series.indices){
+                    retrofit?.getVideoLink(filmRepository.value!!.id, filmRepository.value!!.series.get(i))?.
+                    enqueue(object : Callback<VideoLinkRepository>{
+                        override fun onResponse(
+                            call: Call<VideoLinkRepository>,
+                            response: Response<VideoLinkRepository>
+                        ) {
+                            Log.d(TAG, "onResponse: " + response.toString())
+                            links.add("https:" + response.body()?.results.toString())
+                            //TODO надо чтобы заполнялось одним заходом
+                            linksRepo.postValue(links)
+                        }
+
+                        override fun onFailure(call: Call<VideoLinkRepository>, t: Throwable) {
+                            Log.d(TAG, "onFailure: " + t.message)
+                            Log.d(TAG, "onFailure: " + t.stackTrace)
+                        }
+                    })
+                }
+            }else{
+                retrofit?.getVideoLink(filmRepository.value!!.id, "")?.
                 enqueue(object : Callback<VideoLinkRepository>{
                     override fun onResponse(
                         call: Call<VideoLinkRepository>,
                         response: Response<VideoLinkRepository>
                     ) {
+                        Log.d(TAG, "onResponse: " + response.toString())
+                        Log.d(TAG, "onResponse: " + response.body()?.results.toString())
                         links.add("https:" + response.body()?.results.toString())
-                        Log.d(TAG, "onResponse: link.size " + links.size)
                         //TODO надо чтобы заполнялось одним заходом
-
-                            linksRepo.postValue(links)
-                            Log.d(TAG, "onResponse: links.size " + links.size)
-
+                        Log.d(TAG, "onResponse: " + links.size)
+                        linksRepo.postValue(links)
                     }
 
                     override fun onFailure(call: Call<VideoLinkRepository>, t: Throwable) {
                         Log.d(TAG, "onFailure: " + t.message)
                         Log.d(TAG, "onFailure: " + t.stackTrace)
                     }
-
-
                 })
             }
+            state = false
         }
     }
 

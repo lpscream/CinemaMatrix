@@ -21,7 +21,7 @@ data class Movies(
         var country: String,
         var date_premiere: String,
         var translate_id: String,
-        var serial_id: String,
+        var serial_id: String? = null,
         var serial_count_seasons: String,
         var season_number: String,
         var serial_name: String,

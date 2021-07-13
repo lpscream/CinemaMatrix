@@ -260,18 +260,6 @@ class VideoPlayer : AppCompatActivity() {
                     playerView.showController()
                 }
             }
-            KeyEvent.KEYCODE_MEDIA_NEXT -> {
-                Log.d(TAG, "onKeyDown: KEYCODE_MEDIA_NEXT")
-            }
-            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
-                Log.d(TAG, "onKeyDown: KEYCODE_MEDIA_PREVIOUS")
-            }
-            KeyEvent.KEYCODE_NAVIGATE_NEXT -> {
-                Log.d(TAG, "onKeyDown: KEYCODE_NAVIGATE_NEXT")
-            }
-            KeyEvent.KEYCODE_NAVIGATE_PREVIOUS -> {
-                Log.d(TAG, "onKeyDown: KEYCODE_NAVIGATE_PREVIOUS")
-            }
         }
         return super.onKeyDown(keyCode, event)
     }

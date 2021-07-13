@@ -31,16 +31,16 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/searchTV"
+            android:id="@+id/srchTV"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="8"
             android:hint="@string/search"
             android:maxLines="1"
             android:minLines="1"
+
             android:singleLine="true"
-            android:textSize="12sp"
-            android:focusable="false"/>
+            android:textSize="12sp" />
 
         <Spinner
             android:id="@+id/spinnerGenre"

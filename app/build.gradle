@@ -20,7 +20,7 @@ android {
         applicationId "net.matrixhome.kino"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 47
+        versionCode 48
         versionName "1.1"
         multiDexEnabled true
     }

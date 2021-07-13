@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.setFragmentResultListener
@@ -84,8 +85,6 @@ class FilmCatalogueFragment : Fragment(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         filmViewModel = ViewModelProvider(this).get(FilmCatalougeModel::class.java)
-
-
     }
 
     private fun initVariables(view: View) {
@@ -131,14 +130,9 @@ class FilmCatalogueFragment : Fragment(){
         byRatingRecView.setHasFixedSize(false)
         byDatePremiereRecView.setHasFixedSize(false)
 
-        searchTV = view.findViewById(R.id.searchTV)
-
+        searchTV = view.findViewById(R.id.srchTV)
         countrySpinner = view.findViewById(R.id.spinnerCountry)
         genreSpinner = view.findViewById(R.id.spinnerGenre)
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onCreateView(
@@ -156,10 +150,6 @@ class FilmCatalogueFragment : Fragment(){
         setSearchTvOnKeyListener()
         //setOnIterceptFocusSearch()  //for all RV
         //startParentRecyclerView()//
-
-
-
-
         return view
     }
 
@@ -172,48 +162,48 @@ class FilmCatalogueFragment : Fragment(){
     }
 
     private fun setSearchTvOnKeyListener() {
-        searchTV.setOnKeyListener(View.OnKeyListener { view: View, i: Int, keyEvent: KeyEvent ->
-            when (i) {
-                KeyEvent.KEYCODE_ENTER -> {
-                    if (searchTV.text.toString().length > 2) {
-                        startSearchFragment()
-                        //startSearchActivity(searchTV.text.toString())
-                        return@OnKeyListener true
+        searchTV.setOnKeyListener { view, i, keyEvent ->
+            Log.d(TAG, "setSearchTvOnKeyListener: key event " + i)
+            if (keyEvent.action == KeyEvent.ACTION_UP){
+                when (i) {
+                    KeyEvent.KEYCODE_ENTER -> {
+                        if (searchTV.text.toString().length > 2) {
+                            startSearchFragment()
+                            return@setOnKeyListener false
+                        }
+                    }
+                    KeyEvent.KEYCODE_DPAD_CENTER -> {
+                        val imm: InputMethodManager =
+                            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.showSoftInput(searchTV, InputMethodManager.SHOW_IMPLICIT)
                     }
                 }
-                KeyEvent.KEYCODE_DPAD_CENTER -> {
-                    val imm: InputMethodManager =
-                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(searchTV, InputMethodManager.SHOW_IMPLICIT)
-                }
             }
-            false
-        })
-    }
-
-
-    private fun startSearchActivity(response: String) {
-        val intent = Intent(requireContext(), SearchActivity::class.java)
-        intent.putExtra(SEARCHRESPONSE, response)
-        startActivity(intent)
+            false }
     }
 
 
     private fun startSearchFragment() {
-        val searchFragmnet: SearchCatalogueFragment = SearchCatalogueFragment()
+        Log.d(TAG, "startSearchFragment: ")
+        val searchFragmnet = SearchCatalogueFragment()
         var bundle = Bundle()
         bundle.putString("query", searchTV.text.toString())
         searchFragmnet.arguments = bundle
-        //searchFragmnet.arguments?.putString("query", searchTV.text.toString())
+        hideKeyboard()
         requireActivity().supportFragmentManager.beginTransaction()
             .addToBackStack(null)
-            .replace(R.id.container, searchFragmnet)
+            .add(R.id.container, searchFragmnet)
+            .hide(this)
             .commit()
     }
 
+    fun hideKeyboard() {
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(searchTV.windowToken, 0)
+    }
 
     fun startDescriptionFragment(id: String?, serial_id: String?){
-        val descripFragment: DescripFilmFragment = DescripFilmFragment()
+        val descripFragment = DescripFilmFragment()
         val bundle = Bundle()
         bundle.putString("id", id)
         bundle.putString("serial_id", serial_id)
@@ -222,7 +212,6 @@ class FilmCatalogueFragment : Fragment(){
             .addToBackStack(null)
             .add(R.id.container, descripFragment)
             .hide(this)
-            //.replace(R.id.other_container, descripFragment)
             .commit()
     }
 
@@ -254,6 +243,12 @@ class FilmCatalogueFragment : Fragment(){
                 filmViewModel.byPopularityItemsCount,
                 filmViewModel.getByPopList().value!!.size
             )
+            byPopularityFilmRecView.requestFocus()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                //searchTV.isFocusable = true
+                //searchTV.isClickable = true
+                //searchTV.isSelected = true
+            }
         })
         /////////////////////////////////////////////////////////////////////////////////////////
         filmViewModel.getLastAddedList().observe(viewLifecycleOwner, Observer {
@@ -281,9 +276,6 @@ class FilmCatalogueFragment : Fragment(){
                 filmViewModel.getLastAddedList().value!!.size - filmViewModel.lastAddedItemsCount
             )
             filmViewModel.updateListState1 = false
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                searchTV.focusable = View.FOCUSABLE
-            }
         })
         //////////////////////////////////////////////////////////////////////////////////////////
         filmViewModel.getByRatingList().observe(viewLifecycleOwner, Observer {
@@ -363,7 +355,6 @@ class FilmCatalogueFragment : Fragment(){
         byRatingDataAdapter.notifyDataSetChanged()
         byDatePremiereDataAdapter.notifyDataSetChanged()
     }
-
 
     private fun setOnClickListeners() {
 
@@ -460,42 +451,6 @@ class FilmCatalogueFragment : Fragment(){
                 sortBtnState = true
             }
         }
-    }
-
-    private fun startDescriptionActivity(filmArray: ArrayList<Movies>, position: Int) {
-        val intent = Intent(requireContext(), DescriptionActivity::class.java)
-        intent.putExtra("description", filmArray[position].description)
-        intent.putExtra("name", filmArray[position].name)
-        intent.putExtra("cover", filmArray[position].cover)
-        intent.putExtra("cover_200", filmArray[position].cover_200)
-        intent.putExtra("year", filmArray[position].year)
-        intent.putExtra("id", filmArray[position].id)
-        Log.d(TAG, "startDescriptionActivity: " + filmArray[position].id)
-        intent.putExtra("country", filmArray[position].country)
-        intent.putExtra("director", filmArray[position].director)
-        intent.putExtra("actors", filmArray[position].actors)
-        intent.putExtra("genres", filmArray[position].genres)
-        intent.putExtra("original_name", filmArray[position].original_name)
-        //TODO array with trailers
-        //needs to get ARRAY with trailers
-        //intent.putExtra("trailer_urls", filmArray[position].trailer_urls)
-        intent.putExtra("serial_id", filmArray[position].serial_id)
-        if (filmArray[position].serial_id.equals("null", true)) {
-            intent.putExtra("isSerial", false)
-        } else {
-            intent.putExtra("isSerial", true)
-        }
-        intent.putExtra("serial_count_seasons", filmArray[position].serial_count_seasons)
-        intent.putExtra("season_number", filmArray[position].season_number)
-        intent.putExtra("serial_name", filmArray[position].serial_name)
-        intent.putExtra("serial_o_name", filmArray[position].serial_o_name)
-        intent.putExtra("translate", filmArray[position].translate)
-        val array: Movies
-        array = filmArray[position]
-        val bundle = Bundle()
-        bundle.putSerializable("array", array)
-        intent.putExtras(bundle)
-        startActivity(intent)
     }
 
     override fun onDestroy() {

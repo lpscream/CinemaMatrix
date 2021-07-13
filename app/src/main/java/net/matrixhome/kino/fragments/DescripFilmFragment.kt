@@ -32,25 +32,7 @@ class DescripFilmFragment : Fragment() {
 
     private val TAG = "DescriptionFilmFragment_log"
 
-    //private lateinit var nameTextView: TextView
-    private lateinit var cover: ImageView
-    private lateinit var ratingDiscTextView: TextView
-    private lateinit var ageDiscTextView: TextView
-    private lateinit var filmYearDescTextView: TextView
-    private lateinit var filmCountryDescTextView: TextView
-    private lateinit var filmGenreDescTextView: TextView
-    private lateinit var filmDirectorDescTextView: TextView
-    private lateinit var filmActorDescTextView: TextView
-    private lateinit var translateTextView: TextView
-    private lateinit var isHdTextView: TextView
-    private lateinit var isHdDesc: TextView
-    private lateinit var descriptionTextView: TextView
-    private lateinit var sesonSelectLayout: LinearLayout
-    private lateinit var translateDiscTV: TextView
-    private lateinit var container: ConstraintLayout
-    private lateinit var playBtn: Button
-    private lateinit var seasonChssrRecyclerView: RecyclerView
-    private lateinit var episodeChssrRecyclerView: RecyclerView
+
     private lateinit var seasonAdapter: DescriptionAdapter
     private lateinit var episodeAdapter: DescriptionAdapter
     private lateinit var stringArray: ArrayList<String>
@@ -68,9 +50,7 @@ class DescripFilmFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = DescripFilmFragmentBinding.inflate(inflater, container, false)
-
         val view: View = binding.root
         binding.containerDesc.visibility = View.GONE
         viewModel = ViewModelProvider(this).get(DescriptionFilmViewModel::class.java)
@@ -123,13 +103,14 @@ class DescripFilmFragment : Fragment() {
             fillContentByPosition(position)
         }
         fillContentByPosition(0)
+        binding.seasonChooserRV.requestFocus()
     }
 
     fun fillContentByPosition(position: Int){
         Log.d(TAG, "fillContentByPosition: " + position)
         for (i in viewModel.getSerialRepository().value!!.indices){
             if (viewModel.getSerialRepository().value!![i].season_number == stringArray[position]){
-                serial_id = viewModel.getSerialRepository().value!![i].serial_id
+                serial_id = viewModel.getSerialRepository().value!![i].serial_id!!
                 id = viewModel.getSerialRepository().value!![i].id
                 binding.filmNameDescFragment.text = viewModel.getSerialRepository().value!![i].name + " (" + viewModel.getSerialRepository().value!![i].serial_o_name + ")"
                 binding.filmYearDescFragment.text = viewModel.getSerialRepository().value!![i].year
@@ -138,6 +119,8 @@ class DescripFilmFragment : Fragment() {
                 binding.filmDirectorDescFragment.text = viewModel.getSerialRepository().value!![i].director
                 binding.filmActorsDesActivity.text = viewModel.getSerialRepository().value!![i].actors
                 binding.translateTV.text = viewModel.getSerialRepository().value!![i].translate
+                binding.ageDiscTV.text = viewModel.getSerialRepository().value!![i].age
+                binding.ratingDiscTV.text = viewModel.getSerialRepository().value!![i].rating
                 if (viewModel.getSerialRepository().value!![i].hd == 1) {
                     binding.isHDDiscrp.visibility = View.VISIBLE
                     binding.isHD.text = "HD"
@@ -190,6 +173,8 @@ class DescripFilmFragment : Fragment() {
         binding.filmGenreDescFragment.text = viewModel.getFilmRepository().value?.genres
         binding.filmDirectorDescFragment.text = viewModel.getFilmRepository().value?.director
         binding.filmActorsDesActivity.text = viewModel.getFilmRepository().value?.actors
+        binding.ageDiscTV.text = viewModel.getFilmRepository().value?.age
+        binding.ratingDiscTV.text = viewModel.getFilmRepository().value?.rating
         if (viewModel.getFilmRepository().value?.hd == 1){
             binding.isHD.visibility = View.VISIBLE
             binding.isHDDiscrp.visibility = View.VISIBLE
@@ -216,10 +201,19 @@ class DescripFilmFragment : Fragment() {
         binding.containerDesc.visibility = View.VISIBLE
         binding.seasonSelectLayout.visibility = View.GONE
         createRoundedCorners(binding.playVideoBtn)
-    }
-
-    fun showToast(line: String){
-        Toast.makeText(requireContext(), line, Toast.LENGTH_SHORT).show()
+        binding.playVideoBtn.setOnClickListener {
+            val videoPlayerFragment = VideoPlayerFragment()
+            val bundle = Bundle()
+            bundle.putString("episode_number", "")
+            bundle.putString("serial_id", "")
+            bundle.putString("id", viewModel.getFilmRepository().value?.id)
+            videoPlayerFragment.arguments = bundle
+            requireActivity().supportFragmentManager.beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.container, videoPlayerFragment)
+                .hide(this)
+                .commit()
+        }
     }
 
     fun createRoundedCorners(view: View) {

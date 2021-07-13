@@ -14,11 +14,11 @@ import net.matrixhome.kino.R
 import net.matrixhome.kino.gui.RoundedCornersTransformation
 import net.matrixhome.kino.model.Movies
 
-class SearchAdapter(private val list: ArrayList<Movies>) :
+class SearchAdapter(private var list: ArrayList<Movies>):
     RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
     private val TAG = "SearchAdapter_log"
-
+    private var mClickListener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         Log.d(TAG, "onCreateViewHolder: ")
@@ -38,8 +38,8 @@ class SearchAdapter(private val list: ArrayList<Movies>) :
         holder.filmName?.setText(list.get(position).name)
         holder.ageTV?.setText(list.get(position).age)
         holder.ratingTV?.setText(list.get(position).rating)
-        holder.yearCountry?.setText(list.get(position).year + ", " + list.get(position).country)
-        holder.itemView?.focusable = View.FOCUSABLE
+        holder.yearCountry?.setText(list[position].year + ", " + list.get(position).country)
+        holder.itemView.focusable = View.FOCUSABLE
         holder.itemView.setOnFocusChangeListener { view, b ->
             if (b){
                 view.animate().scaleX(1.1f).scaleY(1.1f).setDuration(200).start()
@@ -53,11 +53,18 @@ class SearchAdapter(private val list: ArrayList<Movies>) :
     }
 
     override fun getItemCount(): Int {
-        return list?.size
+        return list.size
     }
 
+    fun setItemClickListener(itemClickListener: OnItemClickListener){
+        mClickListener = itemClickListener
+    }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    interface  OnItemClickListener{
+        fun onItemClick(view: View, position: Int)
+    }
+
+    inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
         var filmName: TextView? = null
         var filmCover: ImageView? = null
         var ageTV: TextView? = null
@@ -70,9 +77,11 @@ class SearchAdapter(private val list: ArrayList<Movies>) :
             ageTV = itemView.findViewById(R.id.ageTV)
             ratingTV = itemView.findViewById(R.id.ratingTV)
             yearCountry = itemView.findViewById(R.id.yearCountryTV)
+            itemView.setOnClickListener(this)
         }
 
-
-
+        override fun onClick(view: View?) {
+            mClickListener?.onItemClick(view!!, absoluteAdapterPosition)
+        }
     }
 }

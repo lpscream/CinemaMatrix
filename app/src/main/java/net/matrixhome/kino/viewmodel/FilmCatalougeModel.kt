@@ -25,7 +25,8 @@ class FilmCatalougeModel : ViewModel() {
     private var lastAddedFilmListLiveData = MutableLiveData<ArrayList<Movies>>()//added
     private var byPopularityFilmFilmListsLiveData = MutableLiveData<ArrayList<Movies>>()//rating
     private var byRatingFilmListsLiveData = MutableLiveData<ArrayList<Movies>>()//views
-    private var byDatePremiereFilmListsLiveData = MutableLiveData<ArrayList<Movies>>()//date_premiere
+    private var byDatePremiereFilmListsLiveData =
+        MutableLiveData<ArrayList<Movies>>()//date_premiere
 
     private var update_lastAddedFilmList = ArrayList<Movies>()
     private var update_byPopularityFilmFilmLists = ArrayList<Movies>()
@@ -73,17 +74,24 @@ class FilmCatalougeModel : ViewModel() {
         offset.value = ""
         getAllGenres()
         getMovies(lastAddedFilmListLiveData, ADDED, lastAddedOffset, update_lastAddedFilmList)
-        getMovies(byPopularityFilmFilmListsLiveData, VIEWS_MONTH, byPopularityOffset, update_byPopularityFilmFilmLists)
+        getMovies(
+            byPopularityFilmFilmListsLiveData,
+            VIEWS_MONTH,
+            byPopularityOffset,
+            update_byPopularityFilmFilmLists
+        )
         getMovies(byRatingFilmListsLiveData, RATING, byRatingOffset, update_byRatingFilmLists)
-        getMovies(byDatePremiereFilmListsLiveData, DATE_PREMIERE, byDatePremiereOffset, update_byDatePremiereFilmLists)
+        getMovies(
+            byDatePremiereFilmListsLiveData,
+            DATE_PREMIERE,
+            byDatePremiereOffset,
+            update_byDatePremiereFilmLists
+        )
     }
 
     private fun createRetrofit() {
         retrofit = Common.retrofitService
     }
-
-
-
 
 
     private fun getMovies(
@@ -110,9 +118,11 @@ class FilmCatalougeModel : ViewModel() {
                     response: Response<FilmRepository>
                 ) {
                     Log.d(TAG, "onResponse: " + response.toString())
-                            array.addAll(response.body()!!.results)
-                            Log.d(TAG, "onResponse: " + array.size)
-                            liveData.postValue(array)
+                    array.addAll(response.body()!!.results)
+
+                    Log.d(TAG, "onResponse: " + array.size)
+                    //liveData.postValue(array)
+                    liveData.postValue(sortMovieArray(array))
                 }
 
                 override fun onFailure(call: Call<FilmRepository>, t: Throwable) {
@@ -141,27 +151,74 @@ class FilmCatalougeModel : ViewModel() {
     }
 
 
+
+
+    private fun sortMovieArray(array: ArrayList<Movies>): ArrayList<Movies> {
+        var str: String = ""
+        var str2: String = ""
+        var arrayLIst = array as List<Movies>
+        for (i in array.indices) {
+            if (i < array.size){
+                if (array[i].serial_id != null){
+                    var j: Int = 1
+                    while (j <= array.size){
+                        if (i < array.size && j < array.size){
+                            if (array[j].serial_id != null){
+                                if (array[i].serial_id == array[j].serial_id){
+                                    if (j != i){
+                                        array.removeAt(i)
+                                        if (j != 0){
+                                            j = j - 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        j++
+                    }
+                }
+
+            }
+        }
+        return array
+    }
+
+
+
     fun getNewSortedFilList() {
         clearData()
         resetOffset()
         resetUpdateListaState()
-        getMovies(lastAddedFilmListLiveData, ADDED, lastAddedOffset, update_lastAddedFilmList)
-        getMovies(byPopularityFilmFilmListsLiveData, VIEWS_MONTH, byPopularityOffset, update_byPopularityFilmFilmLists)
-        getMovies(byRatingFilmListsLiveData, RATING, byRatingOffset, update_byRatingFilmLists)
-        getMovies(byDatePremiereFilmListsLiveData, DATE_PREMIERE, byDatePremiereOffset, update_byDatePremiereFilmLists)
+        getMovies(lastAddedFilmListLiveData,
+            ADDED, lastAddedOffset, update_lastAddedFilmList)
+        getMovies(
+            byPopularityFilmFilmListsLiveData,
+            VIEWS_MONTH,
+            byPopularityOffset,
+            update_byPopularityFilmFilmLists
+        )
+        getMovies(byRatingFilmListsLiveData,
+            RATING, byRatingOffset, update_byRatingFilmLists)
+        getMovies(byDatePremiereFilmListsLiveData,
+            DATE_PREMIERE,
+            byDatePremiereOffset,
+            update_byDatePremiereFilmLists
+        )
     }
 
     fun getByPopList(): MutableLiveData<ArrayList<Movies>> {
         return byPopularityFilmFilmListsLiveData
     }
 
-    fun getLastAddedList(): MutableLiveData<ArrayList<Movies>>{
+    fun getLastAddedList(): MutableLiveData<ArrayList<Movies>> {
         return lastAddedFilmListLiveData
     }
-    fun getByRatingList(): MutableLiveData<ArrayList<Movies>>{
+
+    fun getByRatingList(): MutableLiveData<ArrayList<Movies>> {
         return byRatingFilmListsLiveData
     }
-    fun getByDatePremiereList(): MutableLiveData<ArrayList<Movies>>{
+
+    fun getByDatePremiereList(): MutableLiveData<ArrayList<Movies>> {
         return byDatePremiereFilmListsLiveData
     }
 
@@ -171,39 +228,59 @@ class FilmCatalougeModel : ViewModel() {
         when (id) {
             ADDED -> {
                 lastAddedOffset = lastAddedOffset + Constants.COUNT.toInt()
-                getMovies(lastAddedFilmListLiveData, ADDED, lastAddedOffset, update_lastAddedFilmList)
+                getMovies(
+                    lastAddedFilmListLiveData,
+                    ADDED,
+                    lastAddedOffset,
+                    update_lastAddedFilmList
+                )
             }
             VIEWS_MONTH -> {
                 byPopularityOffset = byPopularityOffset + Constants.COUNT.toInt()
-                getMovies(byPopularityFilmFilmListsLiveData, VIEWS_MONTH, byPopularityOffset, update_byPopularityFilmFilmLists)
+                getMovies(
+                    byPopularityFilmFilmListsLiveData,
+                    VIEWS_MONTH,
+                    byPopularityOffset,
+                    update_byPopularityFilmFilmLists
+                )
             }
             RATING -> {
                 byRatingOffset = byRatingOffset + Constants.COUNT.toInt()
-                getMovies(byRatingFilmListsLiveData, RATING, byRatingOffset, update_byRatingFilmLists)
+                getMovies(
+                    byRatingFilmListsLiveData,
+                    RATING,
+                    byRatingOffset,
+                    update_byRatingFilmLists
+                )
             }
             DATE_PREMIERE -> {
                 byDatePremiereOffset = byDatePremiereOffset + Constants.COUNT.toInt()
-                getMovies(byDatePremiereFilmListsLiveData, DATE_PREMIERE, byDatePremiereOffset, update_byDatePremiereFilmLists)
+                getMovies(
+                    byDatePremiereFilmListsLiveData,
+                    DATE_PREMIERE,
+                    byDatePremiereOffset,
+                    update_byDatePremiereFilmLists
+                )
             }
         }
     }
 
 
-    fun clearData(){
+    fun clearData() {
         update_byPopularityFilmFilmLists.clear()
         update_byDatePremiereFilmLists.clear()
         update_byRatingFilmLists.clear()
         update_lastAddedFilmList.clear()
     }
 
-    fun resetOffset(){
+    fun resetOffset() {
         lastAddedOffset = 0
         byPopularityOffset = 0
         byRatingOffset = 0
         byDatePremiereOffset = 0
     }
 
-    fun resetUpdateListaState(){
+    fun resetUpdateListaState() {
         updateListState1 = true
         updateListState2 = true
         updateListState4 = true
